@@ -1,0 +1,17 @@
+# Phase 0 extract data contains insured PII — never commit (see spec §10)
+phase0/data/
+phase0/analysis/
+
+# Dependencies / builds
+node_modules/
+.next/
+.vercel/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
