@@ -19,13 +19,19 @@ describe("normalize", () => {
   });
   it("collapses whitespace and caps body excerpt at 1200 chars", () => {
     const n = normalize(base);
-    expect(n.bodyExcerpt.length).toBeLessThanOrEqual(1200);
+    expect(n.bodyExcerpt.length).toBe(1200);
     expect(n.bodyExcerpt).not.toMatch(/\r|\n{3,}| {2,}/);
   });
   it("passes through subject, listId, attachments, dates", () => {
     const n = normalize(base);
     expect(n.subject).toBe(base.subject);
+    expect(n.listId).toBe(null);
     expect(n.attachments).toEqual(["BOP-LPR-signed.pdf"]);
     expect(n.internalDateMs).toBe(base.internalDateMs);
+  });
+  it("passes through non-null listId unchanged", () => {
+    const withListId = { ...base, listId: "<quit.agency.example>" };
+    const n = normalize(withListId);
+    expect(n.listId).toBe("<quit.agency.example>");
   });
 });
