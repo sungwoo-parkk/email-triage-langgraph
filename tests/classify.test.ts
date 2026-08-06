@@ -26,6 +26,29 @@ describe("classifier", () => {
     expect(calls).toBe(2);
   });
 
+  it("retries after schema-invalid output and succeeds", async () => {
+    let calls = 0;
+    const flakySchema = {
+      invoke: async () => {
+        calls++;
+        if (calls === 1) return { tasks: [], confidence: "high", rationale: "" }; // empty tasks violates min(1)
+        return { tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "medium", rationale: "retry ok" };
+      },
+    };
+    const c = await makeClassifier(flakySchema)(email, noRules);
+    expect(c).toEqual({
+      tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "medium", rationale: "retry ok",
+    });
+    expect(calls).toBe(2);
+  });
+
+  it("throws when both attempts return schema-invalid output", async () => {
+    let calls = 0;
+    const alwaysInvalid = { invoke: async () => { calls++; return { tasks: [], confidence: "high", rationale: "" }; } };
+    await expect(makeClassifier(alwaysInvalid)(email, noRules)).rejects.toThrow();
+    expect(calls).toBe(2);
+  });
+
   it("rejects labels outside the classifiable vocabulary", () => {
     const bad = { tasks: [{ labels: ["*1-DONE/DONE-P4"], forward_to: "none" }], confidence: "high", rationale: "" };
     expect(() => ClassificationSchema.parse(bad)).toThrow();
