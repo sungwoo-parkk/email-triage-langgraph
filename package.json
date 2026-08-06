@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "seed-rules": "npx tsx scripts/seed-rules.ts"
+    "seed-rules": "npx tsx scripts/seed-rules.ts",
+    "probe-gmail": "npx tsx scripts/probe-gmail.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.2.5",
