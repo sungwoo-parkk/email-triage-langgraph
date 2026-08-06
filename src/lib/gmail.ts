@@ -1,4 +1,5 @@
 import { google, type gmail_v1 } from "googleapis";
+import { randomBytes } from "node:crypto";
 import type { ThreadSnapshot } from "./normalize";
 
 export function buildQuery(sinceMs: number): string {
@@ -8,7 +9,7 @@ export function buildQuery(sinceMs: number): string {
 export function buildForwardRaw(opts: {
   to: string; from: string; subject: string; comment: string; originalRawB64url: string;
 }): string {
-  const boundary = "triage-fwd-boundary";
+  const boundary = "fwd-" + randomBytes(12).toString("hex");
   const original = Buffer.from(opts.originalRawB64url, "base64url").toString("utf8");
   const mime = [
     `From: ${opts.from}`, `To: ${opts.to}`, `Subject: ${opts.subject}`, "MIME-Version: 1.0",
