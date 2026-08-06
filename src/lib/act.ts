@@ -35,7 +35,10 @@ export async function executeDecision(
         [decisionId, JSON.stringify(executed)]);
     } catch (e) {
       failed = true;
-      await db.query(`update decisions set status = 'failed' where id = $1`, [decisionId]);
+      const detail = e instanceof Error ? e.message : String(e);
+      console.error(`executeDecision ${decisionId} failed:`, detail);
+      await db.query(`update decisions set status = 'failed', error_detail = $2 where id = $1`,
+        [decisionId, detail]);
       break; // fail toward humans: stop acting, dashboard will surface it
     }
   }

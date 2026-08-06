@@ -57,6 +57,8 @@ describe("executeDecision", () => {
     const { g, calls } = fakeGmail();
     await executeDecision(getDb(), g, id, { stage: "shadow", autoActLabels: [] });
     expect(calls).toEqual([]);
+    const { rows } = await getDb().query(`select status from decisions where id=$1`, [id]);
+    expect(rows[0].status).toBe("decided");
   });
 
   it("assisted stage applies labels but never forwards", async () => {
@@ -84,8 +86,9 @@ describe("executeDecision", () => {
       forward: async () => { throw new Error("smtp down"); }, sendAlert: async () => {},
     };
     await executeDecision(getDb(), g, id, { stage: "autonomous", autoActLabels: [] });
-    const { rows } = await getDb().query(`select status, actions_executed from decisions where id=$1`, [id]);
+    const { rows } = await getDb().query(`select status, actions_executed, error_detail from decisions where id=$1`, [id]);
     expect(rows[0].status).toBe("failed");
+    expect(rows[0].error_detail).toBe("smtp down");
     const executed = typeof rows[0].actions_executed === "string" ? JSON.parse(rows[0].actions_executed) : rows[0].actions_executed;
     expect(executed.some((a: any) => a.kind === "labels")).toBe(true);
   });
