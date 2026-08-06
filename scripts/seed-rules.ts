@@ -12,4 +12,4 @@ async function main() {
   const n = await seedRules(db, seeds);
   console.log(`seeded ${n} new rules (${seeds.length} candidates met thresholds)`);
 }
-main().then(() => process.exit(0));
+main().then(() => process.exit(0)).catch((err) => { console.error(err); process.exit(1); });
