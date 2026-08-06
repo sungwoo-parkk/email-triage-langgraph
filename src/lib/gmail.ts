@@ -22,6 +22,17 @@ export function buildForwardRaw(opts: {
 }
 
 function authClient() {
+  // Primary: OAuth refresh token granted directly by pro@agency.example (single-mailbox
+  // blast radius; user declined domain-wide delegation — spec §2, 2026-08-06).
+  if (process.env.GOOGLE_OAUTH_CLIENT_ID) {
+    const oauth2 = new google.auth.OAuth2(
+      process.env.GOOGLE_OAUTH_CLIENT_ID,
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET
+    );
+    oauth2.setCredentials({ refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN });
+    return oauth2;
+  }
+  // Alternative: service account with domain-wide delegation.
   return new google.auth.JWT({
     email: process.env.GOOGLE_SA_EMAIL,
     key: process.env.GOOGLE_SA_PRIVATE_KEY?.replace(/\\n/g, "\n"),

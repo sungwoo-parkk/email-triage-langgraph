@@ -1841,12 +1841,21 @@ git commit -m "feat: LangGraph triage pipeline, cron ingestion, watchdog"
 **Interfaces:**
 - Consumes: everything; produces a deployed shadow-ready service.
 
-- [ ] **Step 1: Google Cloud + DWD setup (human steps, assist and verify)**
+- [ ] **Step 1 (REVISED 2026-08-06 — DWD declined by owner): per-mailbox OAuth setup (human steps, assist and verify)**
 
 1. Create a GCP project; enable the **Gmail API**.
-2. Create a service account (`triage-bot`); create a JSON key; note the **client ID**.
-3. In Google Admin (admin.google.com, agency.example): Security → Access and data control → API controls → **Domain-wide delegation** → Add new: the service account's client ID with scopes `https://www.googleapis.com/auth/gmail.modify,https://www.googleapis.com/auth/gmail.send`.
-4. Populate local `.env` from `.env.example` with the SA email, private key, `GMAIL_USER=pro@agency.example`.
+2. OAuth consent screen: User type **Internal** (Workspace-only; no verification, long-lived refresh tokens).
+3. Create an OAuth client ID, application type **Desktop app**; note the client ID and secret.
+4. Populate local `.env` from `.env.example` with `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET`, `GMAIL_USER=pro@agency.example`.
+5. Run `npm run authorize-gmail`; sign in as **pro@agency.example** in the browser and approve. The script verifies the authorized mailbox and prints `GOOGLE_OAUTH_REFRESH_TOKEN` — add it to `.env` (and later Vercel env).
+
+<details><summary>Original DWD variant (declined; kept for reference)</summary>
+
+1. Create a service account (`triage-bot`); create a JSON key; note the **client ID**.
+2. In Google Admin (admin.google.com, agency.example): Security → Access and data control → API controls → **Domain-wide delegation** → Add new: the service account's client ID with scopes `https://www.googleapis.com/auth/gmail.modify,https://www.googleapis.com/auth/gmail.send`.
+3. Populate local `.env` with the SA email, private key, `GMAIL_USER=pro@agency.example`.
+
+</details>
 
 - [ ] **Step 2: Run the Gmail live probe**
 

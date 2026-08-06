@@ -29,7 +29,7 @@
 | Routing granularity | Queue labels + desk aliases only. No person-level routing in v1 (business decision deferred; person assignment shows no content signal) |
 | Desk aliases (confirmed stable) | carrier invoices → `invoice@agency.example`; broker/insured payment matters → `accounting@agency.example`; NHO endorsements/quotes → `express@agency.example`; `kr2pod@` = KR2 processing pod |
 | Team logic | KR = back-office commodity processing regardless of book; NY = front-office judgment work; book decides shared functions (NHO → NY, DP/CP commercial → KR). No written prefix table exists — learned from data |
-| Gmail access | Google Cloud service account with domain-wide delegation on pro@agency.example (fallback: OAuth refresh token) |
+| Gmail access | **OAuth 2.0 refresh token granted directly by pro@agency.example** (user decision 2026-08-06: domain-wide delegation declined on security grounds — per-mailbox grant limits blast radius to the one consenting account; consent screen Internal; re-authorize via `npm run authorize-gmail` if pro@'s password changes). Service-account DWD remains in code as an unused alternative |
 | EPIC integration | Phase 2, via Applied Epic SDK (confirmed possible); v1 does not block on it |
 | Review surface | Web dashboard (review queue + audit log + metrics) in the same app |
 
