@@ -67,3 +67,9 @@ Lightweight records of the decisions the design hinges on. Format: context → d
 **Context:** The blind test showed confidence output is honest but blunt (86/88 rated "high"); some categories are measurably weaker than others at identical stated confidence.
 **Decision:** Auto-action requires stated `high` confidence **and** every label in `autoActLabels` — a config allow-list seeded from measured per-category F1 (≥ 0.86 bar). `4-CAN REQ` (0.82), `Billing` (0.74), junk detection: review-only.
 **Consequences:** The safety load rests on measurement, not model self-report. The allow-list is runtime config — categories graduate by evidence without a deploy.
+
+## ADR-12 · Epic-driven person routing — phase 2, person + desk (decided direction)
+
+**Context (2026-08-06):** v1 forwards only to desk aliases (ADR-6) because email content carries no person signal. But Applied Epic *does* hold the truth — an account manager / CSR field per client/policy — and SDK access is confirmed available. The owner wants data-driven routing to the right person.
+**Decision:** After the desk-alias rollout reaches stable autonomous operation: (1) extend the classifier schema to extract policy number and insured name; (2) add an Epic lookup node between `classify` and `decide` that resolves the account owner; (3) forwards target the **person and the owning desk alias together**; (4) Epic lookup failure or no-match falls back to desk-only routing — never blocks, never guesses; (5) person-forwards start review-only and graduate through the same measured gates as every other capability.
+**Consequences:** Routing comes from the system of record instead of convention; stale Epic assignments are caught by the desk copy rather than failing silently; the pipeline gains its first external data dependency, contained by the fallback. Timing keeps v1's risk profile untouched.

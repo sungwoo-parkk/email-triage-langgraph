@@ -141,6 +141,13 @@ Principle: **fail toward humans, never fail-open.** The designed failure mode is
 ## 8. Phase 2 roadmap (out of v1 scope)
 
 - **EPIC integration** (Applied Epic SDK): agentic subgraph off `act` — e.g. auto-filing carrier docs, bounce disposition, "confirmed done in EPIC" closure verification. Enabled by activating the LangGraph Postgres checkpointer for durable multi-step runs.
+- **EPIC-driven person routing** (direction confirmed 2026-08-06; SDK access available):
+  - Routing truth is the **account manager / CSR field** on the Epic client/policy record — not email content (phase 0 confirmed content carries no person signal).
+  - Classifier schema gains extraction fields it already sees well: policy number (book prefixes `TWC/KWC/WWC/SWC`, …), insured name.
+  - New **lookup node** between `classify` and `decide` queries Epic by those entities; the result (owner, team) lands in the `decisions` row like rule hits do today.
+  - Forward style: **person + owning desk alias** — the person gets speed, the desk catches stale assignments and absences.
+  - Failure mode: Epic unavailable or no match → **fall back to desk-alias routing** (today's behavior), never block or guess.
+  - Trust path: person-forwards enter through the same staged gates as everything else (review-only until measured), regardless of how mature desk-forwards are by then.
 - **LangSmith** tracing/evals as env-var opt-in.
 - Person-level routing (pending business decision + roster), USLI label canonicalization (pending business decision), label hygiene, Gmail filter consolidation (the 22 filters can eventually be subsumed by the rules table), reply drafting, productization/multi-tenant.
 
@@ -154,6 +161,6 @@ Principle: **fail toward humans, never fail-open.** The designed failure mode is
 ## 10. Open items (explicitly deferred, not blockers)
 
 - USLI renewal-quote canonical label + current stream ownership (business decision).
-- Person-level routing and current roster (business decision).
-- EPIC SDK access details (credentials, environment) — needed at phase 2 start, not before.
+- ~~Person-level routing and current roster (business decision).~~ **Resolved 2026-08-06:** person routing via Epic account-manager lookup in phase 2 (see §8); no static roster needed.
+- ~~EPIC SDK access details (credentials, environment) — needed at phase 2 start, not before.~~ **Resolved 2026-08-06:** access confirmed available.
 - Data handling note: Phase 0 extract data (`phase0/data/`, `phase0/analysis/`) contains insured PII — keep out of version control; live system stores only body excerpts needed for audit/review.
