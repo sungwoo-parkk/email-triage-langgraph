@@ -43,3 +43,45 @@ describe("config", () => {
     await expect(getConfig(getDb())).rejects.toThrow();
   });
 });
+
+describe("config: autoActLabels defaults", () => {
+  beforeAll(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+  });
+
+  it("defaults autoActLabels to the strong-category list", async () => {
+    const cfg = await getConfig(getDb());
+    const expected = [
+      "2-NY",
+      "2-NY/Endorsement",
+      "2-NY/Recommendation",
+      "3-Endorsement",
+      "3-KR",
+      "3-KR/DOCS&NOTICE",
+      "3-KR/POLICY REQUEST",
+      "3-KR/USLI RENEWAL QUOTE",
+      "4-CAN REQ",
+      "6-RENEWAL QUOTE-USLI",
+      "7-Loss Run Req",
+      "8-C-105.2",
+      "Cancelllation",
+    ].sort();
+    expect(cfg.autoActLabels.sort()).toEqual(expected);
+  });
+});
+
+describe("config: autoActLabels override", () => {
+  beforeAll(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+  });
+
+  it("round-trips an autoActLabels override", async () => {
+    await setConfigKey(getDb(), "autoActLabels", ["3-KR"]);
+    const cfg = await getConfig(getDb());
+    expect(cfg.autoActLabels).toEqual(["3-KR"]);
+  });
+});
