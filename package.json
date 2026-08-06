@@ -10,7 +10,8 @@
     "test": "vitest run",
     "seed-rules": "npx tsx scripts/seed-rules.ts",
     "probe-gmail": "npx tsx scripts/probe-gmail.ts",
-    "probe-gemini": "npx tsx scripts/probe-gemini.ts"
+    "probe-gemini": "npx tsx scripts/probe-gemini.ts",
+    "eval-blindtest": "npx tsx scripts/eval-blindtest.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.2.5",

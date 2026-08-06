@@ -8,14 +8,16 @@ const AppConfigSchema = z.object({
 });
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 
-// Categories the blind test measured strong (F1 >= 0.86) start auto-act-eligible;
-// weak categories stay review-only until eval proves otherwise (spec 4.4).
+// Categories the Gemini 3.6 Flash blind-test baseline (2026-08-06, spec §7) measured
+// strong (F1 >= 0.86) start auto-act-eligible; weak categories stay review-only until
+// eval proves otherwise (spec 4.4). "4-CAN REQ" measured 0.82 — review-only for now.
+// "2-NY" stays: it has no category of its own but rides along as a co-label on strong ones.
 const DEFAULTS: AppConfig = {
   stage: "shadow",
   autoActLabels: CLASSIFIABLE_LABELS.filter((l) =>
     ["2-NY/Endorsement", "3-Endorsement", "7-Loss Run Req", "8-C-105.2", "3-KR/POLICY REQUEST",
      "2-NY/Recommendation", "6-RENEWAL QUOTE-USLI", "3-KR/USLI RENEWAL QUOTE", "3-KR",
-     "3-KR/DOCS&NOTICE", "Cancelllation", "4-CAN REQ", "2-NY"].includes(l)
+     "3-KR/DOCS&NOTICE", "Cancelllation", "2-NY"].includes(l)
   ),
 };
 

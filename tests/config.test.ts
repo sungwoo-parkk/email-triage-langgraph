@@ -62,7 +62,6 @@ describe("config: autoActLabels defaults", () => {
       "3-KR/DOCS&NOTICE",
       "3-KR/POLICY REQUEST",
       "3-KR/USLI RENEWAL QUOTE",
-      "4-CAN REQ",
       "6-RENEWAL QUOTE-USLI",
       "7-Loss Run Req",
       "8-C-105.2",

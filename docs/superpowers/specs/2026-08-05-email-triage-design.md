@@ -126,6 +126,18 @@ Principle: **fail toward humans, never fail-open.** The designed failure mode is
 - **Live:** shadow mode is the continuous integration test against reality; `v_agreement` is its readout.
 - **Review loop as tuning data:** `reviews` rows feed periodic prompt/rules refinement; high-purity correction patterns can be promoted into `rules` (source=`learned`) via the dashboard.
 
+### 7.1 Gemini baseline (measured 2026-08-06)
+
+88-thread blind test, `gemini-3.6-flash`, schema-enforced output (`scripts/eval-blindtest.ts`; predictions in `phase0/analysis/blindtest/predictions-gemini.json`, misses in `misses-gemini.json`):
+
+- **Raw exact-set match: 77.3% (68/88) — clears the ≥76.8% gate with no adjustments.** Mean Jaccard 0.845; high-confidence subset 77.9% (67/86).
+- Apples-to-apples on the identical unadjusted scorer, the Phase 0 Claude predictions score **67.0% (59/88)** — Gemini is +10.3 points raw. (Phase 0's published 81.8% included an arrival-time adjustment whose script was not preserved; applying even a minimal version of it — crediting the 4 Gemini misses that are exact after removing arrival-time `junk-no-action` artifacts from the truth key — puts Gemini at 81.8% (72/88), high-confidence 82.6%.)
+- Structural co-emit adjustment fixes 0 misses (model already co-emits `3-KR/DOCS&NOTICE` on cancellation notices).
+- Strong categories (F1): carrier-cancellation-notice 0.95, carrier-docs-filing 0.94, loss-run-request 0.94, usli-renewal-quote 0.94, wc-certificate 0.93, endorsement-request 0.90, recommendation-compliance 0.90, policy-document-request 0.89.
+- Below the 0.86 strong bar: cancellation-request 0.82 (P 0.78 — `4-CAN REQ` moved to review-only in `autoActLabels`), billing-money 0.74 (R 0.64; already review-only), junk-no-action R 0.23 (model classifies by content, missing threads that merely *ended* as disregard — expected at arrival time; already review-only).
+- Confidence is honest but blunt: 86/88 rated high. Per-category gating (autoActLabels) carries the safety load, as designed.
+- **Verdict: gate passed; shadow mode may begin once Task 12 (deployment + DWD) completes.**
+
 ## 8. Phase 2 roadmap (out of v1 scope)
 
 - **EPIC integration** (Applied Epic SDK): agentic subgraph off `act` — e.g. auto-filing carrier docs, bounce disposition, "confirmed done in EPIC" closure verification. Enabled by activating the LangGraph Postgres checkpointer for durable multi-step runs.

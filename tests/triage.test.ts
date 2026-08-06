@@ -57,9 +57,10 @@ describe("triage graph (shadow stage)", () => {
   });
 
   it("rule miss classifies via LLM and records llm_output", async () => {
+    // 7-Loss Run Req is in the default autoActLabels strong list (4-CAN REQ no longer is)
     const g = buildTriageGraph({ db: getDb(), gmail: silentGmail,
-      classify: async () => ({ tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "high", rationale: "r" }) });
-    const id = await g.run(email("g2", "vicky@oakmont.com", "cancel please", "signed LPR attached"));
+      classify: async () => ({ tasks: [{ labels: ["7-Loss Run Req"], forward_to: "none" }], confidence: "high", rationale: "r" }) });
+    const id = await g.run(email("g2", "vicky@oakmont.com", "loss runs please", "need claims history for renewal"));
     const { rows } = await getDb().query(`select llm_output, status from decisions where id=$1`, [id]);
     expect(rows[0].llm_output).toBeTruthy();
     expect(rows[0].status).toBe("decided");
