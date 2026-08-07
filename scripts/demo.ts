@@ -102,7 +102,7 @@ async function main() {
     query: async (sql, params) => {
       if (!params || params.length === 0) {
         const trimmed = sql.trim().toUpperCase();
-        if (trimmed.startsWith("CREATE") || trimmed.startsWith("INSERT")) {
+        if (trimmed.startsWith("CREATE") || trimmed.startsWith("INSERT") || trimmed.startsWith("ALTER")) {
           await p.exec(sql);
           return { rows: [] };
         }

@@ -9,7 +9,7 @@ function pgliteAdapter(p: PGlite): Querier {
       // Use exec for non-parameterized DDL (migration content may have multiple statements)
       if (!params || params.length === 0) {
         const trimmed = sql.trim().toUpperCase();
-        if (trimmed.startsWith("CREATE") || trimmed.startsWith("INSERT")) {
+        if (trimmed.startsWith("CREATE") || trimmed.startsWith("INSERT") || trimmed.startsWith("ALTER")) {
           await p.exec(sql);
           return { rows: [] };
         }
