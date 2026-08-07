@@ -19,7 +19,7 @@ export const OfficeConfigSchema = z.object({
     model: z.string().regex(/^[a-z0-9_]+:.+$/i, "llm.model must be a provider:model string"),
     apiKeyEnv: z.string().min(1),
   }),
-  mining: z.object({ months: z.number().int().min(1).max(24).default(6), maxThreads: z.number().int().min(100).max(50000).default(5000) }).default({}),
+  mining: z.object({ months: z.number().int().min(1).max(24).default(6), maxThreads: z.number().int().min(100).max(50000).default(5000) }).default({ months: 6, maxThreads: 5000 }),
 });
 
 export type Routee = z.infer<typeof RouteeSchema>;
