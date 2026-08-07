@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "office": { "name": "Hartley & Sons", "mailbox": "info@hartleysons.example" },
+  "routees": [
+    { "id": "jo", "name": "Jo Hartley", "email": "jo@hartleysons.example", "description": "Billing, invoices, payment and refund questions" },
+    { "id": "sales", "name": "Sales desk", "email": "sales@hartleysons.example", "description": "Quotes, new orders, product availability" },
+    { "id": "support", "name": "Support", "email": "support@hartleysons.example", "description": "Order status, returns, product problems, complaints" }
+  ],
+  "categories": [],
+  "review": { "recipient": "jo@hartleysons.example" },
+  "llm": { "model": "google_genai:gemini-3.6-flash", "apiKeyEnv": "GEMINI_API_KEY" },
+  "mining": { "months": 6, "maxThreads": 5000 }
+}

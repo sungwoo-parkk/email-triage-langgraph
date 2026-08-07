@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "office": { "name": "Case-Study Agency", "mailbox": "pro@agency.example" },
+  "routees": [
+    { "id": "invoice-desk", "name": "Invoice desk", "email": "invoice@agency.example", "description": "Carrier invoices, commission and account-current statements" },
+    { "id": "accounting-desk", "name": "Accounting desk", "email": "accounting@agency.example", "description": "Broker/insured payment matters, refunds, payment plans" },
+    { "id": "express-desk", "name": "Express desk", "email": "express@agency.example", "description": "NHO homeowners endorsements and quotes" }
+  ],
+  "categories": [
+    { "id": "carrier-docs", "description": "Machine-generated carrier document deliveries for filing (policy prints, dec pages, audit statements)", "route": null },
+    { "id": "carrier-cancellation", "description": "Carrier-issued cancellation notice, warning, or endorsement (misspelled 'Cancelllation' in the historical Gmail labels)", "route": null },
+    { "id": "cancel-request", "description": "Retail broker asks to cancel a policy, usually with a signed LPR/ACORD", "route": null },
+    { "id": "loss-run-request", "description": "Broker requests loss runs / claims history", "route": null },
+    { "id": "wc-certificate", "description": "NY Workers Comp C-105.2 / wall poster / WC certificate requests", "route": null },
+    { "id": "policy-doc-request", "description": "Broker asks for a copy of an existing document (dec page, full policy, binder)", "route": null },
+    { "id": "commercial-endorsement", "description": "Broker asks to change a commercial policy (mortgagee, address, AI, limits, payment plan)", "route": null },
+    { "id": "nho-endorsement", "description": "Homeowners-book endorsement", "route": "express-desk" },
+    { "id": "recommendation", "description": "Loss-control recommendation compliance: premises photos, signed rec letters, enforcement replies", "route": null },
+    { "id": "usli-renewal-quote", "description": "USLI renewal quote deliveries and reminders", "route": null },
+    { "id": "carrier-invoice", "description": "Carrier invoices and statements", "route": "invoice-desk" },
+    { "id": "payment-matter", "description": "Broker or insured payment matters", "route": "accounting-desk" },
+    { "id": "front-office", "description": "Front-office judgment work: new business quoting, underwriter correspondence", "route": null },
+    { "id": "undelivered", "description": "Bounces/NDRs of the agency's own outbound notices", "route": null }
+  ],
+  "review": { "recipient": "pro@agency.example" },
+  "llm": { "model": "google_genai:gemini-3.6-flash", "apiKeyEnv": "GEMINI_API_KEY" },
+  "mining": { "months": 6, "maxThreads": 5000 }
+}
