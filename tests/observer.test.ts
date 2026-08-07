@@ -54,6 +54,21 @@ async function seedNeedsReview(db: Querier, threadId: string, fromAddr = "a@vend
   return recordDecision(db, email, noRules, null, d, "shadow", null);
 }
 
+// Same real decide()/recordDecision() pipeline, but with a high-confidence LLM
+// classification and categoryId in autoActLabels so decide() lands on status
+// "decided" with a resolved TriageTask routed to categoryId — exercises the
+// status !== "needs_review" half of the observer's correction condition.
+async function seedDecided(db: Querier, threadId: string, categoryId: string, fromAddr = "a@vendor.example", internalDateMs = NOW - 10_000) {
+  const email = normalize({
+    threadId, from: fromAddr, to: [], subject: `${threadId} subject`, listId: null,
+    attachments: [], bodyText: "body", internalDateMs, references: [],
+  });
+  const llm = { tasks: [{ category: categoryId }], confidence: "high" as const, rationale: "test" };
+  const decidedCfg = { stage: "shadow" as const, autoActLabels: [categoryId] };
+  const d = decide(vocab, REVIEW, noRules, llm, decidedCfg);
+  return recordDecision(db, email, noRules, llm, d, "shadow", null);
+}
+
 describe("observeSentMail", () => {
   beforeEach(async () => {
     // Fresh PGlite per test so ingest_state row 2's checkpoint (and the corrections/
@@ -108,5 +123,23 @@ describe("observeSentMail", () => {
     // tests/seed.test.ts, tests/act.test.ts) rather than as JSON strings, so guard both.
     const labelSet = typeof rows[0].label_set === "string" ? JSON.parse(rows[0].label_set) : rows[0].label_set;
     expect(labelSet).toEqual(["jo"]);
+  });
+
+  it("agreement with a decided routing is not a correction", async () => {
+    await seedDecided(getDb(), "t-agree", "sales");
+    const mail = makeFakeMail({ sent: [snap("t-agree", { to: ["sales@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    const r = await observeSentMail(getDb(), mail, cfg, NOW);
+    expect(r.corrections).toBe(0);
+    const { rows } = await getDb().query(`select 1 from corrections where thread_id='t-agree'`);
+    expect(rows).toHaveLength(0);
+  });
+
+  it("a forward that contradicts a decided routing IS a correction", async () => {
+    await seedDecided(getDb(), "t-contra", "sales");
+    const mail = makeFakeMail({ sent: [snap("t-contra", { to: ["support@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    const r = await observeSentMail(getDb(), mail, cfg, NOW);
+    expect(r.corrections).toBe(1);
+    const { rows } = await getDb().query(`select category_id from corrections where thread_id='t-contra'`);
+    expect(rows[0].category_id).toBe("support");
   });
 });
