@@ -1,98 +1,79 @@
 /**
- * Zero-credential demo: runs synthetic insurance emails through the REAL triage
- * pipeline (rules engine -> classifier -> decide gate -> record -> act) on an
- * in-memory Postgres (PGlite). Gmail is faked; the classifier is canned unless
- * you pass --live with GEMINI_API_KEY set.
+ * Zero-credential demo: runs six representative emails from the example office's own
+ * mail history (examples/hartley/history.json) through the REAL triage pipeline (rules
+ * engine -> classifier -> decide gate -> record -> act) on an in-memory Postgres
+ * (PGlite). Gmail is faked; the classifier is canned unless you pass --live with
+ * GEMINI_API_KEY set (examples/hartley/triage.config.json's configured model).
  *
  *   npm run demo            # fully offline, no keys needed
  *   npm run demo -- --live  # real Gemini classification of the same emails
  */
+import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { setDb, getDb, type Querier } from "../src/lib/db";
 import { runMigrations } from "../src/lib/migrate";
 import { buildTriageGraph } from "../src/graph/triage";
-import type { ThreadSnapshot } from "../src/lib/normalize";
+import type { ThreadSnapshot } from "../src/lib/mail/types";
 import { setConfigKey, getConfig } from "../src/lib/config";
 import { executeDecision, makeContextBodyFor } from "../src/lib/act";
 import type { MailClient } from "../src/lib/mail/types";
 import { makeClassifier, type Classification } from "../src/lib/classify";
 import { loadOfficeConfig, setOfficeConfig, deriveVocabulary } from "../src/lib/officeConfig";
 
-// TEMPORARY (Task 6/7): pinned to the AGY example config; Task 11 makes this pick an
-// office at the command line and rewrites the fixtures/output for the new config-driven
-// routing model properly. The canned fixtures below use AGY's real category ids (Task 7
-// moved classification off free Gmail label strings onto office-vocabulary ids) and an
-// explicit autoActLabels override below approximates the old curated strong-category
-// list under the new ids, purely so this offline demo still exercises the same
-// auto-act/needs_review narrative as before.
-const officeCfg = loadOfficeConfig("examples/agency/triage.config.json");
+const officeCfg = loadOfficeConfig("examples/hartley/triage.config.json");
+const history = JSON.parse(readFileSync("examples/hartley/history.json", "utf8")) as {
+  inbox: ThreadSnapshot[]; sent: ThreadSnapshot[];
+};
+const byThreadId = new Map(history.inbox.map((t) => [t.threadId, t]));
+const snap = (threadId: string): ThreadSnapshot => {
+  const t = byThreadId.get(threadId);
+  if (!t) throw new Error(`demo fixture: no such thread in examples/hartley/history.json: ${threadId}`);
+  return t;
+};
 
-// Approximates config.ts's (still Gmail-label-shaped) DEFAULTS strong-category curation
-// under the new office-vocabulary category ids, so the demo keeps distinguishing
-// auto-act from review-only the way its per-fixture notes describe.
-const STRONG_CATEGORY_IDS = [
-  "carrier-cancellation", "loss-run-request", "wc-certificate", "commercial-endorsement", "nho-endorsement",
-];
+// A real office's autoActLabels come from the onboarding eval (see `triage init`'s mining
+// pipeline), never hand-curated. This demo skips that pipeline for speed and just states
+// the outcome directly - "jo" and "sales" measured strong, "support" and the builtin
+// "junk" stay review-only - so the shadow/autonomous narrative below has something to
+// contrast against.
+const AUTO_ACT_IDS = ["jo", "sales"];
 
-interface Fixture { snap: ThreadSnapshot; canned: Classification | "rule-handles-this"; note: string }
+interface Fixture { threadId: string; canned: Classification | "rule-handles-this"; note: string }
 
 const FIXTURES: Fixture[] = [
   {
-    note: "carrier print feed -> deterministic rule, LLM never called",
-    snap: { threadId: "demo-1", from: "DB Agent Copy <ny_agent_copy@dxc.com>", subject: "Agent Copy of Print - Policy DP2201984",
-      listId: null, attachments: ["DP2201984.pdf"], bodyText: "Attached is the agent copy of the policy print.", internalDateMs: 1, to: [], references: [] },
+    threadId: "hartley-vendor-03",
+    note: "vendor statement -> deterministic mined rule (sender_domain officesupply.example), LLM never called",
     canned: "rule-handles-this",
   },
   {
-    note: "carrier cancellation notice -> strong category, auto-decides",
-    snap: { threadId: "demo-2", from: "Policy Services <policyservices@lighthouse-mutual.example>", subject: "Cancellation Endorsement - Policy CP8811223 - RIVERSIDE HARDWARE LLC",
-      listId: null, attachments: ["cancellation-endorsement.pdf"], bodyText: "Please find the cancellation endorsement effective 09/15 for nonpayment of premium.", internalDateMs: 2, to: [], references: [] },
-    canned: { tasks: [{ category: "carrier-cancellation" }], confidence: "high", rationale: "Carrier-issued cancellation endorsement." },
+    threadId: "hartley-quote-01",
+    note: "clear quote request -> sales desk, strong category, auto-decides",
+    canned: { tasks: [{ category: "sales" }], confidence: "high", rationale: "New quote request for chairs; routes to the sales desk." },
   },
   {
-    note: "loss run request -> strong category, auto-decides",
-    snap: { threadId: "demo-3", from: "Amy Torres <amy@harborpoint-ins.example>", subject: "Loss runs needed - GOLDEN WOK RESTAURANT INC",
-      listId: null, attachments: [], bodyText: "Hi team, could you send 3 years of loss runs for the above insured? Renewal marketing.", internalDateMs: 3, to: [], references: [] },
-    canned: { tasks: [{ category: "loss-run-request" }], confidence: "high", rationale: "Broker requests claims history." },
+    threadId: "hartley-newsletter-01",
+    note: "trade newsletter -> junk is review-only even at high confidence (never auto-acted)",
+    canned: { tasks: [{ category: "junk" }], confidence: "high", rationale: "Marketing newsletter, no action needed." },
   },
   {
-    note: "NY workers-comp certificate -> strong category, auto-decides",
-    snap: { threadId: "demo-4", from: "CSR Desk <csr@midtowncoverage.example>", subject: "C105 for GREEN GARDEN DELI CORP WWC1122334",
-      listId: null, attachments: ["cert-holder.png"], bodyText: "Please provide C-105.2 with the below certificate holder. Thank you.", internalDateMs: 4, to: [], references: [] },
-    canned: { tasks: [{ category: "wc-certificate" }], confidence: "high", rationale: "NY WC certificate request (WWC prefix)." },
+    threadId: "hartley-support-01",
+    note: "order-status question -> support desk, measured weaker, stays review-only for now",
+    canned: { tasks: [{ category: "support" }], confidence: "high", rationale: "Order status inquiry; routes to the support desk." },
   },
   {
-    note: "carrier invoice -> review-only even at high confidence (not a strong category)",
-    snap: { threadId: "demo-5", from: "AR <billing@lighthouse-mutual.example>", subject: "Commission statement and invoice - August",
-      listId: null, attachments: ["invoice-0826.pdf"], bodyText: "Your monthly statement is attached. Amount due: $4,120.55 by 09/01.", internalDateMs: 5, to: [], references: [] },
-    canned: { tasks: [{ category: "carrier-invoice" }], confidence: "high", rationale: "Carrier invoice for the agency." },
+    threadId: "hartley-mix-03",
+    note: "genuinely ambiguous invoice question -> honest medium confidence routes to a human",
+    canned: { tasks: [{ category: "jo" }], confidence: "medium", rationale: "Possible invoice discrepancy; amount doesn't clearly match a known order." },
   },
   {
-    note: "two requests in one email -> two tasks; weaker one holds the whole decision",
-    snap: { threadId: "demo-6", from: "Gina Park <gina@queensbridge-brokers.example>", subject: "MAPLE CLEANERS - address change + cancel BOP",
-      listId: null, attachments: ["signed-LPR.pdf"], bodyText: "Two things: update the mailing address to 44-02 Main St, and cancel the BOP effective 9/30 - signed LPR attached.", internalDateMs: 6, to: [], references: [] },
-    canned: { tasks: [
-      { category: "commercial-endorsement" },
-      { category: "cancel-request" },
-    ], confidence: "high", rationale: "Endorsement request plus broker cancellation request." },
-  },
-  {
-    note: "NHO homeowners endorsement -> desk-convention forward",
-    snap: { threadId: "demo-7", from: "Leo Chan <leo@brightpath-brokerage.example>", subject: "NHO - add mortgagee clause - 88 GARDEN AVE",
-      listId: null, attachments: [], bodyText: "Please add the mortgagee clause below to the homeowners policy and send the updated dec page.", internalDateMs: 7, to: [], references: [] },
-    canned: { tasks: [{ category: "nho-endorsement" }], confidence: "high", rationale: "NHO book endorsement; express desk convention." },
-  },
-  {
-    note: "newsletter -> junk is review-only (never auto-acted)",
-    snap: { threadId: "demo-8", from: "Insurance Weekly <news@insuranceweekly.example>", subject: "5 trends reshaping commercial lines",
-      listId: "<news.insuranceweekly.example>", attachments: [], bodyText: "This week in insurance: markets, MGAs, and more. Unsubscribe anytime.", internalDateMs: 8, to: [], references: [] },
-    canned: { tasks: [{ category: "junk" }], confidence: "high", rationale: "Marketing newsletter, no action." },
-  },
-  {
-    note: "genuinely ambiguous -> honest medium confidence routes to humans",
-    snap: { threadId: "demo-9", from: "info@oldclient.example", subject: "question about my policy",
-      listId: null, attachments: [], bodyText: "Hi, I had a question about what my policy covers, can someone call me back?", internalDateMs: 9, to: [], references: [] },
-    canned: { tasks: [{ category: "front-office" }], confidence: "medium", rationale: "Unclear request; front-office judgment needed." },
+    threadId: "hartley-mix-15",
+    note: "two requests in one email -> two tasks; the weaker one (support) holds back the whole decision",
+    canned: {
+      tasks: [{ category: "sales" }, { category: "support" }],
+      confidence: "high",
+      rationale: "A new quote request plus an unrelated order-status check.",
+    },
   },
 ];
 
@@ -132,13 +113,16 @@ async function main() {
   const db = getDb();
   await runMigrations(db);
   await setOfficeConfig(db, officeCfg);
-  await setConfigKey(db, "autoActLabels", STRONG_CATEGORY_IDS);
+  await setConfigKey(db, "autoActLabels", AUTO_ACT_IDS);
+  // The mined-gold rule `triage init` would have produced from this office's own mail
+  // history (validated against examples/hartley/history.json: 8/8 pure, support 8 - see
+  // Step 1 of the Task 11 brief). Inserted directly here so the demo stays offline.
   await db.query(
-    `insert into rules (pattern_type, pattern, label_set, complete, source)
-     values ('sender_domain', 'dxc.com', '["carrier-docs"]', true, 'phase0')`
+    `insert into rules (pattern_type, pattern, label_set, complete, purity, support, source)
+     values ('sender_domain', 'officesupply.example', '["jo"]', true, 1.0, 8, 'mined-gold')`
   );
 
-  const canned = new Map(FIXTURES.map((f) => [f.snap.threadId, f.canned]));
+  const canned = new Map(FIXTURES.map((f) => [f.threadId, f.canned]));
   const classify = live
     ? makeClassifier(officeCfg, [])
     : async (email: { threadId: string }) => {
@@ -150,20 +134,23 @@ async function main() {
   const gmailLog: string[] = [];
   const graph = buildTriageGraph({ db, mail: fakeGmail(gmailLog), classify: classify as any });
 
-  console.log(`\n=== EMAIL TRIAGE DEMO ${live ? "(live Gemini)" : "(offline, canned classifier)"} ===\n`);
+  console.log(`\n=== TRIAGE DEMO: ${officeCfg.office.name} ${live ? "(live Gemini)" : "(offline, canned classifier)"} ===\n`);
   console.log("STAGE: shadow - the pipeline decides and records, Gmail is never touched.\n");
-  console.log(`  ${pad("FROM", 34)} ${pad("SUBJECT", 40)} ${pad("LABELS", 38)} ${pad("FWD", 18)} ${pad("CONF", 6)} STATUS`);
-  console.log("  " + "-".repeat(148));
+  console.log(`  ${pad("FROM", 34)} ${pad("SUBJECT", 40)} ${pad("LABELS", 24)} ${pad("FWD", 30)} ${pad("CONF", 6)} STATUS`);
+  console.log("  " + "-".repeat(140));
 
   const ids: number[] = [];
+  let sampleReviewDecisionId: number | null = null;
   for (const f of FIXTURES) {
-    const id = await graph.run(await normalizeSnap(f.snap));
+    const email = snap(f.threadId);
+    const id = await graph.run(await normalizeSnap(email));
     ids.push(id);
     const { rows } = await db.query(`select final_tasks, confidence, status from decisions where id = $1`, [id]);
     const tasks = typeof rows[0].final_tasks === "string" ? JSON.parse(rows[0].final_tasks) : rows[0].final_tasks;
     const labels = [...new Set(tasks.map((t: any) => t.label))].join(", ");
     const fwd = tasks.map((t: any) => t.forwardTo).filter(Boolean).join(", ") || "-";
-    console.log(`  ${pad(f.snap.from.replace(/^.*</, "").replace(/>$/, ""), 34)} ${pad(f.snap.subject, 40)} ${pad(labels || "-", 38)} ${pad(fwd, 18)} ${pad(rows[0].confidence, 6)} ${rows[0].status}`);
+    if (rows[0].status === "needs_review" && sampleReviewDecisionId === null) sampleReviewDecisionId = id;
+    console.log(`  ${pad(email.from.replace(/^.*</, "").replace(/>$/, ""), 34)} ${pad(email.subject, 40)} ${pad(labels || "-", 24)} ${pad(fwd, 30)} ${pad(rows[0].confidence, 6)} ${rows[0].status}`);
     console.log(`  ${pad("", 34)} > ${f.note}`);
   }
 
@@ -173,15 +160,21 @@ async function main() {
   await setConfigKey(db, "stage", "autonomous");
   const cfg = await getConfig(db);
   const vocab = deriveVocabulary(officeCfg);
-  const ctx = { vocab, contextBodyFor: makeContextBodyFor(db, vocab) };
+  const contextBodyFor = makeContextBodyFor(db, vocab);
+  const ctx = { vocab, contextBodyFor };
   for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg, ctx);
   gmailLog.forEach((l) => console.log(l));
   console.log(`\n  Executed ${gmailLog.length} Gmail action(s). needs_review decisions still send a review-forward (a`);
   console.log(`  planned action, gated like any other) but their status stays needs_review for a human.`);
 
+  if (sampleReviewDecisionId !== null) {
+    console.log(`\n  Sample review-forward context body (decision #${sampleReviewDecisionId}):\n`);
+    console.log((await contextBodyFor(sampleReviewDecisionId)).split("\n").map((l) => `    ${l}`).join("\n"));
+  }
+
   const before = gmailLog.length;
   for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg, ctx);
-  console.log(`  Re-running all decisions executes ${gmailLog.length - before} action(s) - idempotency: a retry can never double-send.\n`);
+  console.log(`\n  Re-running all decisions executes ${gmailLog.length - before} action(s) - idempotency: a retry can never double-send.\n`);
 }
 
 async function normalizeSnap(s: ThreadSnapshot) {

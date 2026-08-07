@@ -3,9 +3,12 @@ import { loadOfficeConfig } from "../src/lib/officeConfig";
 import { makeClassifier } from "../src/lib/classify";
 import { normalize } from "../src/lib/normalize";
 
-// TEMPORARY (Task 6): the classifier now predicts office-config category ids directly
-// (see src/lib/classify.ts), so the old Gmail-label -> phase0-category mapping this
-// script used to do is gone. Task 11 redoes blind-test scoring against the new taxonomy.
+// Pinned to the AGY case-study config, same as evals/run.ts — this script re-plays the
+// frozen 88-thread phase0 blind test (docs/case-study/) and now writes predictions as
+// office-config category ids (src/lib/classify.ts's current output shape) rather than
+// the historical Gmail label strings. `phase0/score_blindtest.py`'s truth key still uses
+// the historical labels; comparing the two needs the same translation evals/run.ts
+// applies to evals/dataset.json (see its LABEL_TO_CATEGORY table) before re-scoring.
 const cfg = loadOfficeConfig("examples/agency/triage.config.json");
 
 async function main() {

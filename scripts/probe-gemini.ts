@@ -1,9 +1,12 @@
 import { loadOfficeConfig } from "../src/lib/officeConfig";
 import { makeClassifier } from "../src/lib/classify";
 
-// TEMPORARY (Task 6): pinned to the AGY example config; Task 11 makes CLI scripts
-// office-config-driven (path/office picked at the command line).
-const cfg = loadOfficeConfig("examples/agency/triage.config.json");
+// Deliberately pinned to the AGY case-study config (docs/case-study/): the probe email
+// below is a two-request insurance thread (endorsement + cancellation) built to exercise
+// that taxonomy's multi-task split, so it only makes sense against AGY's categories. To
+// probe a different office's live model, point loadOfficeConfig at that office's
+// triage.config.json and swap in a representative email for its own vocabulary.
+const cfg = loadOfficeConfig(process.argv[2] ?? "examples/agency/triage.config.json");
 
 async function main() {
   const classify = makeClassifier(cfg, []);

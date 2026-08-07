@@ -10,7 +10,6 @@
     "test": "vitest run",
     "demo": "npx tsx scripts/demo.ts",
     "eval": "npx tsx --env-file=.env evals/run.ts",
-    "seed-rules": "npx tsx --env-file=.env scripts/seed-rules.ts",
     "probe-gmail": "npx tsx --env-file=.env scripts/probe-gmail.ts",
     "probe-gemini": "npx tsx --env-file=.env scripts/probe-gemini.ts",
     "authorize-gmail": "npx tsx --env-file=.env scripts/authorize-gmail.ts",

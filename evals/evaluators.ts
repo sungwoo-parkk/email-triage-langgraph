@@ -6,31 +6,28 @@
  * TS attribute access, returning { key, score, comment }.
  */
 import { z } from "zod";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { applyStructuralRules } from "../src/lib/rules";
+import { loadOfficeConfig, deriveVocabulary } from "../src/lib/officeConfig";
 
-// TEMPORARY (Task 6): the classifier now emits a single `category` id per task and no
-// per-task forward_to (see src/lib/classify.ts); the golden dataset.json still uses the
-// old label/forward_to shape until Task 11 refreshes it to the office-config taxonomy.
-// Accept both shapes so this keeps compiling and produces sane (if imperfect) scores.
-type Task = { category?: string; labels?: string[]; forward_to?: string; forwardTo?: string };
-const taskLabels = (t: Task): string[] => (t.category ? [t.category] : t.labels ?? []);
+// Both sides of every comparison below are already office-config category ids by the
+// time they reach these evaluators: the golden dataset is translated from its historical
+// Gmail label shape at upload time (see evals/run.ts's LABEL_TO_CATEGORY), and the
+// classifier under test emits category ids natively (src/lib/classify.ts). Routing is
+// derived from examples/agency/triage.config.json's category -> routee `route` field — the
+// same config the classifier itself was built from — so both sides use one source of truth.
+type Task = { category: string };
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const vocab = deriveVocabulary(loadOfficeConfig(path.join(HERE, "..", "examples/agency/triage.config.json")));
 
-// The blind test treats the two USLI renewal-quote labels as one category (both are
-// dispatcher-accepted); mirror that here so the metric measures real disagreement.
-function canon(labels: string[]): string[] {
-  return applyStructuralRules(
-    labels.map((l) => (l === "3-KR/USLI RENEWAL QUOTE" ? "6-RENEWAL QUOTE-USLI" : l))
-  ).sort();
-}
-
-const labelUnion = (tasks: Task[]) => canon([...new Set((tasks ?? []).flatMap(taskLabels))]);
+const categorySet = (tasks: Task[]) => [...new Set((tasks ?? []).map((t) => t.category))].sort();
 const forwardSet = (tasks: Task[]) =>
-  [...new Set((tasks ?? []).map((t) => t.forward_to ?? t.forwardTo).filter((f) => f && f !== "none"))].sort();
+  [...new Set((tasks ?? []).map((t) => vocab.routeFor(t.category)).filter((f): f is string => !!f))].sort();
 
 export function exactSetMatch(run: any, example: any) {
-  const got = labelUnion(run.outputs?.tasks ?? []);
-  const want = labelUnion(example.outputs?.tasks ?? []);
+  const got = categorySet(run.outputs?.tasks ?? []);
+  const want = categorySet(example.outputs?.tasks ?? []);
   const match = JSON.stringify(got) === JSON.stringify(want);
   return { key: "exact_set_match", score: match ? 1 : 0, comment: `got [${got}] want [${want}]` };
 }
@@ -46,15 +43,6 @@ export function forwardMatch(run: any, example: any) {
   const want = forwardSet(example.outputs?.tasks ?? []);
   const match = JSON.stringify(got) === JSON.stringify(want);
   return { key: "forward_match", score: match ? 1 : 0, comment: `got [${got}] want [${want}]` };
-}
-
-// Measures the MODEL's instruction-following on the co-emit rule specifically —
-// deliberately checks the raw output, before applyStructuralRules would patch it.
-export function coEmitCompliance(run: any, _example: any) {
-  const raw = [...new Set(((run.outputs?.tasks ?? []) as Task[]).flatMap(taskLabels))];
-  if (!raw.includes("Cancelllation")) return { key: "co_emit_compliance", score: 1, comment: "n/a (no Cancelllation)" };
-  const ok = raw.includes("3-KR/DOCS&NOTICE");
-  return { key: "co_emit_compliance", score: ok ? 1 : 0, comment: ok ? "co-emitted" : "missing 3-KR/DOCS&NOTICE alongside Cancelllation" };
 }
 
 export function latencySeconds(run: any, _example: any) {

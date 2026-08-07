@@ -1,6 +1,10 @@
 # Operations runbook
 
-Audience: whoever is on call. Assumes access to the Vercel project, the production Postgres, and the `pro@agency.example` Google account.
+Audience: whoever is on call for a deployed office. This runbook applies to any office
+running this system; it's written against **[`pro@agency.example`](case-study/README.md)**, the
+case-study example, as a concrete worked example — substitute your own office's mailbox,
+Vercel project, and Postgres. Assumes access to the Vercel project, the production
+Postgres, and the office's Gmail account.
 
 > Current state: **not yet deployed** (plan Task 12 in progress). Sections marked ⏳ apply once the service is live; they are written now so day one has a runbook.
 
@@ -33,11 +37,11 @@ Takes effect on the next graph run (≤2 min). No deploy needed.
 
 ## ⏳ Alert: watchdog email ("ingestion silent")
 
-Fires when no ingest run has succeeded in 15 minutes.
+Fires when no ingest run has succeeded in 15 minutes, sent to the office config's `review.recipient` — there is no separate `ALERT_EMAIL` env var; the config is the single source of truth for who gets alerted (a deployment with no office config yet fails quiet rather than alerting nobody).
 
 1. Check Vercel → Crons: is `/api/cron/ingest` firing? Check function logs for the error.
 2. `401 unauthorized` in logs → `CRON_SECRET` mismatch between Vercel cron config and env.
-3. Gmail `invalid_grant` → the OAuth refresh token was revoked (commonly: pro@'s password changed). Re-run `npm run authorize-gmail`, update `GOOGLE_OAUTH_REFRESH_TOKEN` in Vercel env, redeploy.
+3. Gmail `invalid_grant` → the OAuth refresh token was revoked (commonly: the office mailbox's password changed). Re-run `npm run authorize-gmail`, update `GOOGLE_OAUTH_REFRESH_TOKEN` in Vercel env, redeploy.
 4. Gemini quota/5xx → systemic errors abort the run by design; the next cron retries. Sustained: check billing/quota on the GCP project.
 5. Database connection errors → check the Postgres provider status page / connection limits.
 
@@ -56,7 +60,9 @@ from decisions where status = 'failed' order by created_at desc limit 20;
 
 ## ⏳ Review queue
 
-Until the dashboard ships, the queue is a query:
+There is no hosted dashboard in v1 by design — email is the review UI (a `needs_review`
+decision forwards to the office's review recipient with the proposed routing in the body;
+see [product.md](product.md)). For an ad hoc look at the backlog, the queue is a query:
 
 ```sql
 select d.id, t.from_addr, t.subject, d.final_tasks, d.confidence, d.created_at
@@ -68,20 +74,20 @@ Humans triage these in Gmail as they do today. (In shadow stage *everything* is 
 
 ## Rules maintenance
 
-Rules are data. Adding a manual rule (example: a new carrier's document feed):
+Rules are data, keyed by the office's own category ids (not label strings). Adding a manual rule (example: a new carrier's document feed, AGY's config):
 
 ```sql
 insert into rules (pattern_type, pattern, label_set, complete, source, active)
-values ('sender_domain', 'newcarrier.com', '["3-KR","3-KR/DOCS&NOTICE"]', true, 'manual', true);
+values ('sender_domain', 'newcarrier.com', '["carrier-docs"]', true, 'manual', true);
 ```
 
-- `complete = true` means a hit fully resolves the thread and skips the LLM — only set it when you're confident the label set is always right for this pattern.
+- `complete = true` means a hit fully resolves the thread and skips the LLM — only set it when you're confident the category set is always right for this pattern.
 - Deactivate (don't delete) a bad rule: `update rules set active = false where id = …;`
-- Re-seed from phase-0 stats (idempotent, `on conflict do nothing`): `npm run seed-rules`.
+- Rules are normally seeded per-office by `triage init`'s mining pipeline (mines the office's own inbox/sent history — see `src/lib/mining.ts`), not hand-inserted; the case study's original rule set was seeded once from its phase-0 study (`source = 'phase0'`).
 
 ## Prompt / model changes
 
-Any change to `src/lib/prompt.ts`, the model ID, or thresholds requires re-running the eval **before merge**:
+Any change to `src/lib/promptgen.ts`, the model ID, or thresholds requires re-running the eval **before merge**:
 
 ```bash
 npm run eval-blindtest     # 88 Gemini calls, a few minutes
@@ -101,10 +107,11 @@ Regression gate: no category F1 drops materially and the exact-set match stays �
 | Env var | What / where it comes from |
 |---|---|
 | `GOOGLE_OAUTH_CLIENT_ID` / `_SECRET` | GCP OAuth Desktop client (Internal consent screen) |
-| `GOOGLE_OAUTH_REFRESH_TOKEN` | `npm run authorize-gmail`, consented by pro@agency.example |
-| `GEMINI_API_KEY` / `GEMINI_MODEL` | Google AI key; model pinned `gemini-3.6-flash` |
+| `GOOGLE_OAUTH_REFRESH_TOKEN` | `npm run authorize-gmail` (or `triage init`'s connect step), consented by the office mailbox |
+| `<cfg.llm.apiKeyEnv>` (e.g. `GEMINI_API_KEY`) | The office's chosen LLM provider key; env var name is per-office config (`llm.apiKeyEnv`), not hardcoded |
 | `DATABASE_URL` | Vercel Marketplace Postgres |
 | `CRON_SECRET` | Random; must match Vercel cron config |
-| `ALERT_EMAIL` | Where the watchdog complains |
+
+No `ALERT_EMAIL` — the watchdog alerts the office config's `review.recipient` (see "Alert: watchdog email" above); that's config, not a secret.
 
 Rotation notes: OAuth token — re-run authorize script. Gemini key — GCP console, update env, redeploy. `CRON_SECRET` — update env and cron config together.

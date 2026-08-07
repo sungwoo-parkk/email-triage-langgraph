@@ -1,15 +1,21 @@
 # Evaluation & observability
 
-How classifier quality is measured across model versions and prompt changes. Companion to [architecture.md](architecture.md); run infrastructure lives in [`evals/`](../evals/).
+How classifier quality is measured across model versions and prompt changes. Companion to
+[architecture.md](architecture.md); run infrastructure lives in [`evals/`](../evals/). This
+harness is office-config-driven — any office can run it against its own config once it has
+mined history — but the numbers below are the case study's ([`docs/case-study/`](case-study/README.md)):
+`npm run eval` targets [`examples/agency/triage.config.json`](../examples/agency/triage.config.json),
+the flagship example office, so every model/prompt change is measured against a fixed,
+committed dataset for regression tracking.
 
 ## Two datasets, two roles
 
 | Dataset | Where | Role |
 |---|---|---|
-| **88-thread blind test** (real mail) | `phase0/analysis/` — PII, gitignored, local only | The real-world promotion gate (≥76.8% exact-set match; spec §7) |
+| **88-thread blind test** (real mail) | `phase0/analysis/` — PII, gitignored, local only | The real-world promotion gate that shadow-moded the case study (≥76.8% exact-set match; [design-spec.md](case-study/design-spec.md) §7) |
 | **67-email golden set** (synthetic, fictional) | [`evals/dataset.json`](../evals/dataset.json) — committed, public | Regression + quality tracking; runnable by anyone with keys |
 
-The golden set covers all major categories plus the hard cases: multi-request emails, review-only categories, junk, a bounce, and near-miss traps (a *reinstatement* notice that must NOT be classified as a cancellation; an *endorsement copy request* that is a document request, not an endorsement).
+The golden set covers all major categories plus the hard cases: multi-request emails, review-only categories, junk, a bounce, and near-miss traps (a *reinstatement* notice that must NOT be classified as a cancellation; an *endorsement copy request* that is a document request, not an endorsement). Its labels are still written in AGY's original 42-label Gmail vocabulary (a frozen historical record — see [`docs/case-study/`](case-study/README.md)); `evals/run.ts` translates them to `examples/agency/triage.config.json`'s category ids at upload time (its `LABEL_TO_CATEGORY` table) so the harness grades the classifier's actual current output shape.
 
 ## Metrics
 
@@ -17,15 +23,16 @@ Runs execute as **LangSmith experiments** (`npm run eval`), so every model/promp
 
 | Metric | Type | What it measures | Baseline (gemini-3.6-flash, 2026-08-07) |
 |---|---|---|---|
-| `exact_set_match` | code | Predicted label set == golden (after structural normalization; USLI label pair canonicalized) | **91.0%** |
+| `exact_set_match` | code | Predicted category-id set == golden's (both sides in `examples/agency/triage.config.json`'s category-id space) | **91.0%** |
 | `task_count_match` | code | Multi-request emails split into the right number of tasks | **100%** |
-| `forward_match` | code | Desk-alias forwarding conventions | **100%** |
-| `co_emit_compliance` | code | Model itself co-emits `3-KR/DOCS&NOTICE` with `Cancelllation` (checked pre-patch) | **100%** |
+| `forward_match` | code | Desk routing derived from each side's categories via the config's `route` field | **100%** |
 | `latency_s` | code | End-to-end classify latency | **2.63s mean** |
 | `faithfulness` | LLM judge | Rationale grounded in the email — no fabricated details | **97.0%** |
 | `instruction_following` | LLM judge | 4-point rubric: task splitting, companion labels, forward conventions, confidence honesty | **97.4%** |
 
-Label hallucination is not a metric because it is structurally impossible: the zod enum locks output to the 42-label vocabulary. Once entity extraction lands (ADR-12), extraction hallucination becomes a *programmatic* metric (extracted policy number either appears in the source or it doesn't).
+These are the last full measurements taken under the historical label-shaped harness (2026-08-07, pre-translation); a `--sync` run re-uploads the translated dataset and re-measures on the identical model/prompt, so the numbers are expected to hold — the translation changes only how both sides are compared, not what the classifier predicts. Re-verified narrowly (3-example smoke run, `--no-judges`) as part of this translation: `exact_set_match`/`forward_match`/`task_count_match` all 100% on that subset.
+
+Label hallucination is not a metric because it is structurally impossible: the zod enum is built from the office config at runtime and locks output to its category vocabulary (14 categories + `junk` for this example office). Once entity extraction lands (ADR-12), extraction hallucination becomes a *programmatic* metric (extracted policy number either appears in the source or it doesn't).
 
 ## Running
 
@@ -46,12 +53,14 @@ The first run of the instruction-following judge scored 89.9% — and nearly eve
 
 Fix: the judges now receive the authoritative companion-label conventions table and explicit scope rules. Same classifier outputs, recalibrated judges: 89.9% → 97.4% and 86.6% → 97.0%. The residual failures are real. Moral: **an uncalibrated judge measures its own priors, not your system** — judge prompts need the same evidence-grounding discipline as the classifier prompt.
 
-## Golden review status
+## Golden review status (historical)
 
-Draft goldens were LLM-authored and are under owner review. The current 6 `exact_set_match` disagreements reduce to 3 open convention questions:
-
-1. Does `2-NY/Endorsement` ride with bare `2-NY`? (4 of 6 disagreements; model omits it, draft goldens include it)
-2. Does a broker's return-premium inquiry carry `2-NY` alongside `Billing`? (1)
-3. Is a *pending cancellation for inspection non-compliance* a `Cancelllation` notice or `2-NY/Recommendation` enforcement? (1 — genuinely ambiguous even for humans)
-
-Resolutions get encoded into `evals/dataset.json` (and, where the model is right, into the taxonomy prompt), then `npm run eval -- --sync`.
+The open convention questions this section used to track (e.g. "does `2-NY/Endorsement`
+ride with bare `2-NY`?") were about Gmail's *label-bucketing* convention — a specific label
+plus a companion "bucket" label filed alongside it for folder nesting, never a second work
+item. The office-config category-id taxonomy has no bucket-label concept at all: a task is
+exactly one category id, full stop. `evals/run.ts`'s translation table resolves the
+bucketing mechanically (drops the bucket, keeps the specific id — see its `translateTask`)
+rather than through further owner review, so this class of disagreement can no longer
+recur. Genuinely ambiguous *content* questions (e.g. a borderline cancellation-vs-recommendation
+case) remain owner-reviewable the normal way: edit `evals/dataset.json`, then `npm run eval -- --sync`.

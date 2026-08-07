@@ -1,0 +1,714 @@
+{
+  "inbox": [
+    {
+      "threadId": "hartley-vendor-01",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1001",
+      "listId": null,
+      "attachments": [
+        "statement-1001.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $412.55. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1780172800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-01",
+      "from": "Sam Okafor <sam@brightline-consulting.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Need quote for 12 desks and matching chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're setting up a new consulting office and need a quote for 12 desks with matching task chairs.",
+      "internalDateMs": 1780259200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-01",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: 5 office layout trends for 2026",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: 5 office layout trends for 2026. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1780345600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-01",
+      "from": "Marcus Yee <marcus@brightpath-design.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for 40 chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, could you send a quote for 40 ergonomic task chairs for our new office? We're budget conscious and need them by end of month.",
+      "internalDateMs": 1780518400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-02",
+      "from": "Front Desk <frontdesk@lakeview-dental.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Do you have adjustable standing desks in stock?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Quick question - do you currently stock height-adjustable standing desks, and what's the lead time?",
+      "internalDateMs": 1780691200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-02",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1002",
+      "listId": null,
+      "attachments": [
+        "statement-1002.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $388.20. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1780950400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-03",
+      "from": "Karen Voss <karen@voss-accounting.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Question about invoice #7714",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "I have a question about invoice #7714 - the total doesn't match what we discussed. Can someone look into it?",
+      "internalDateMs": 1780950400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-04",
+      "from": "Tomas Reyes <tomas@reyes-architecture.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization for extra chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered too many chairs by mistake. Can we get a return authorization for 4 of them?",
+      "internalDateMs": 1781209600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-01",
+      "from": "Diane Ostrowski <diane@fernvalley-clinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order #48213 - still not delivered",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered filing cabinets three weeks ago (order #48213) and they haven't arrived. Can someone check on this?",
+      "internalDateMs": 1781296000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-02",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Supply chain update: chair backorders easing",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Supply chain update: chair backorders easing. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1781468800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-05",
+      "from": "Michelle Ann <michelle@brightside-yoga.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 55210",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Just checking on the status of PO 55210 - placed it last week and haven't heard anything.",
+      "internalDateMs": 1781468800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-03",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1003",
+      "listId": null,
+      "attachments": [
+        "statement-1003.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $501.75. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1781728000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-06",
+      "from": "Booking <booking@harboreventspace.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Rental quote for folding tables (one-time event)",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're hosting a one-time event and need a rental quote for 20 folding tables and 80 chairs.",
+      "internalDateMs": 1781728000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-07",
+      "from": "Nate Kowalski <nate@kowalski-family-dental.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Chair arrived missing hardware",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the chairs we received is missing the armrest hardware. Can you send the missing parts?",
+      "internalDateMs": 1781987200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-08",
+      "from": "Alicia Brandt <alicia@brandtlaw.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Can I get a copy of my last invoice?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could someone send me a copy of our most recent invoice for our records? Thank you.",
+      "internalDateMs": 1782246400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-04",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1004",
+      "listId": null,
+      "attachments": [
+        "statement-1004.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $296.40. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1782505600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-09",
+      "from": "Devon Marsh <devon@marsh-landscaping.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for outdoor patio furniture x 6 sets",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for a quote on 6 sets of outdoor patio furniture for a client showcase area.",
+      "internalDateMs": 1782505600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-03",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: How hybrid offices are rethinking desk ratios",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: How hybrid offices are rethinking desk ratios. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1782592000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-10",
+      "from": "Priscilla Nunez <priscilla@nunez-realtygroup.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Refund question - returned bookcase",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We returned a bookcase two weeks ago and haven't seen the refund yet. Can you check the status?",
+      "internalDateMs": 1782764800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-02",
+      "from": "Priya Shah <priya@northgate-realty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing request - reception desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're furnishing a new lobby and need pricing on 2 reception desks and matching guest chairs.",
+      "internalDateMs": 1782851200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-11",
+      "from": "Ops <ops@stonebridge-cowork.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk pricing for 25 desks + 25 chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a new coworking floor and need bulk pricing for 25 desks and 25 task chairs.",
+      "internalDateMs": 1783024000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-05",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1005",
+      "listId": null,
+      "attachments": [
+        "statement-1005.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $447.10. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1783283200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-12",
+      "from": "Front Office <front@willowbrook-clinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Where is my order? Placed 2 weeks ago",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We placed an order two weeks ago and haven't received a shipping update. Can you look into it?",
+      "internalDateMs": 1783283200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-13",
+      "from": "Ellery Frost <ellery@frostdesignstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged filing cabinet - need replacement part",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "The filing cabinet we received has a bent drawer rail. Can you send a replacement part or a new unit?",
+      "internalDateMs": 1783542400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-04",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Buyer's guide: ergonomic seating on a budget",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Buyer's guide: ergonomic seating on a budget. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1783715200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-14",
+      "from": "Bianca Ruiz <bianca@ruiz-tax.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Payment plan for outstanding balance",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We have an outstanding balance from our last order - is a short payment plan possible?",
+      "internalDateMs": 1783801600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-06",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1006",
+      "listId": null,
+      "attachments": [
+        "statement-1006.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $519.85. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1784060800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-15",
+      "from": "Corey Tran <corey@tranmedgroup.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for 8 chairs, and a question about order #33110",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Two things: first, could you send a quote for 8 task chairs for our waiting room? Second, can you check the status of order #33110 - it was supposed to ship last week.",
+      "internalDateMs": 1784060800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-02",
+      "from": "Ray Colton <ray@colton-law.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged chair on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the chairs from our recent order arrived with a cracked base. Can we get a replacement?",
+      "internalDateMs": 1784147200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-16",
+      "from": "Office Manager <office@parkside-vet.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Reception seating quote + status on order #29981",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We need a quote for reception seating (2 loveseats, 3 chairs), and separately wanted to check whether our last order (#29981) has shipped yet.",
+      "internalDateMs": 1784320000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-17",
+      "from": "Gwen Ashford <gwen@ashford-interiors.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Product availability - height-adjustable desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have height-adjustable desks available in a walnut finish? Need 6 units.",
+      "internalDateMs": 1784579200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-07",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1007",
+      "listId": null,
+      "attachments": [
+        "statement-1007.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $362.30. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1784838400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-05",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Q3 pricing outlook for office furniture",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Q3 pricing outlook for office furniture. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1784838400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-18",
+      "from": "Marcus Webb <marcus@webb-financial.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Following up on quote request from last week",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Just following up - did the quote request I sent last week come through? Haven't heard back.",
+      "internalDateMs": 1784838400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-19",
+      "from": "Dana Iverson <dana@iverson-consulting.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Complaint - wrong chairs delivered",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1785097600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-20",
+      "from": "Front Desk <front@brightpath-medical.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Billing discrepancy on recent order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "There's a discrepancy between the quote we received and the invoice we were billed. Can someone review it?",
+      "internalDateMs": 1785356800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-08",
+      "from": "OfficeSupply Co Billing <statements@officesupply.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Monthly statement #1008",
+      "listId": null,
+      "attachments": [
+        "statement-1008.pdf"
+      ],
+      "bodyText": "Attached is your monthly statement from OfficeSupply Co. Amount due: $470.60. Please remit payment within 30 days of the statement date.",
+      "internalDateMs": 1785616000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-21",
+      "from": "Wanda Silva <wanda@silva-designstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote needed for 15 task chairs, rush order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Need a rush quote for 15 task chairs - our current ones broke down and we need replacements ASAP.",
+      "internalDateMs": 1785616000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-22",
+      "from": "Terrence Boyd <terrence@boyd-startup.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status check - PO 61234",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking in on PO 61234 - it's been over a week since we placed it.",
+      "internalDateMs": 1785875200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-06",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Sustainable materials in commercial furniture",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Sustainable materials in commercial furniture. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1785961600000,
+      "references": []
+    }
+  ],
+  "sent": [
+    {
+      "threadId": "hartley-vendor-01",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1001",
+      "listId": null,
+      "attachments": [
+        "statement-1001.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1780259200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-01-fwd",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Quote for 40 chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1780691200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-02",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1002",
+      "listId": null,
+      "attachments": [
+        "statement-1002.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1781036800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-01-fwd",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Order #48213 - still not delivered",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1781555200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-03",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1003",
+      "listId": null,
+      "attachments": [
+        "statement-1003.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1781814400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-04",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1004",
+      "listId": null,
+      "attachments": [
+        "statement-1004.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1782592000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-02-fwd",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Pricing request - reception desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1783024000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-05",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1005",
+      "listId": null,
+      "attachments": [
+        "statement-1005.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1783369600000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-06",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1006",
+      "listId": null,
+      "attachments": [
+        "statement-1006.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1784147200000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-02-fwd",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Damaged chair on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1784406400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-07",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1007",
+      "listId": null,
+      "attachments": [
+        "statement-1007.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1784924800000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-vendor-08",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Monthly statement #1008",
+      "listId": null,
+      "attachments": [
+        "statement-1008.pdf"
+      ],
+      "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
+      "internalDateMs": 1785702400000,
+      "references": []
+    }
+  ]
+}
