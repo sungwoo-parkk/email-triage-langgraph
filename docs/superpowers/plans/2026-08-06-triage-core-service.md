@@ -1,6 +1,6 @@
 # Email Triage Core Service Implementation Plan
 
-> **Status (2026-08-06):** Tasks 1–11 and 13 complete (67 tests green on `triage-core`; Gemini eval gate PASSED — see spec §7.1). Remaining: **Task 12** (deployment + DWD setup — human-in-the-loop checklist).
+> **Status (2026-08-07):** Tasks 1–11 and 13 complete; Task 12 complete except cron scheduling (67 tests green; Gemini eval gate PASSED — spec §7.1). Deployed to `agency-triage.vercel.app`: per-mailbox OAuth authorized + probed, Neon Postgres provisioned (3 migrations, 36 rules seeded), first manual ingest verified (7 threads, 0 failures, 0 Gmail writes), watchdog healthy. **Pending:** cron cadence needs Vercel Pro or an external scheduler (Hobby = daily-only) — owner deferred the decision; `shadow-start` tag waits for scheduled ingestion.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

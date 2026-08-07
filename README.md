@@ -2,7 +2,7 @@
 
 Automated classification and dispatch for AGY's operations intake mailbox. Every inbound thread is labeled with the dispatcher's existing 42-label Gmail vocabulary and, where the desk convention requires it, forwarded to the owning desk alias — with humans reviewing everything the system isn't sure about.
 
-**Status (2026-08-06):** core service complete on branch `triage-core` (67 tests green). Gemini eval gate **passed** (77.3% raw ≥ 76.8% gate). Awaiting deployment + Gmail OAuth setup (plan Task 12) → then ~2 weeks of shadow mode.
+**Status (2026-08-07):** deployed to production at `agency-triage.vercel.app` (Neon Postgres, 36 rules seeded, OAuth live, first ingest verified: 7 threads, 0 failures, 0 Gmail writes). Gemini eval gate **passed** (77.3% raw ≥ 76.8%). One item pending before the shadow-mode clock starts: **cron scheduling** (Vercel Hobby allows only daily crons — upgrade to Pro or wire an external scheduler; until then, ingestion is manual-trigger only).
 
 ## Start here, by role
 
