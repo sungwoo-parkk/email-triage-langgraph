@@ -37,15 +37,22 @@ async function correctionsCount(db: Querier, sinceMs: number): Promise<number> {
  * Plain-text daily digest: how many emails routed themselves, how many are waiting on
  * a human, how many errored out (with detail), and how many corrections the office
  * made - built from three queries against `decisions`/`corrections` since `sinceMs`.
+ *
+ * "Routed" counts only `acted` decisions - a `decided` row means the classifier
+ * proposed a route but (in shadow stage, the onboarding default) nothing was actually
+ * sent or labeled. Counting `decided` as routed would tell the office "N routed
+ * automatically" while the report's own promise is "nothing sends automatically" -
+ * so shadow-stage intent gets a separate, truthfully-worded body line instead.
  */
 export async function buildDigest(db: Querier, sinceMs: number): Promise<{ subject: string; body: string }> {
   const counts = await countsByStatus(db, sinceMs);
   const failures = await recentFailures(db, sinceMs);
   const corrections = await correctionsCount(db, sinceMs);
 
-  const routed = counts.decided + counts.acted;
+  const routed = counts.acted;
   const waiting = counts.needs_review;
   const errors = counts.failed;
+  const recordedOnly = counts.decided;
 
   const subject = `[triage] daily digest — ${routed} routed, ${waiting} waiting, ${errors} errors`;
 
@@ -57,6 +64,10 @@ export async function buildDigest(db: Querier, sinceMs: number): Promise<{ subje
     `${errors} failed and need a look.`,
     ``,
   ];
+
+  if (recordedOnly) {
+    lines.push(`Recorded only (shadow — nothing was sent or labeled): ${recordedOnly} would have been auto-routed.`, ``);
+  }
 
   if (failures.length) {
     lines.push(`Failures:`);
