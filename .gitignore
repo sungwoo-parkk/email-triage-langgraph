@@ -49,3 +49,11 @@ next-env.d.ts
 # Python
 __pycache__/
 *.pyc
+
+.vercel
+.env*
+
+# local tool artifacts
+.agents/
+.claude/
+skills-lock.json

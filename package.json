@@ -1,5 +1,5 @@
 {
-  "name": "next-scaffold",
+  "name": "email-triage-langgraph",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
+    "demo": "npx tsx scripts/demo.ts",
     "seed-rules": "npx tsx --env-file=.env scripts/seed-rules.ts",
     "probe-gmail": "npx tsx --env-file=.env scripts/probe-gmail.ts",
     "probe-gemini": "npx tsx --env-file=.env scripts/probe-gemini.ts",
