@@ -9,7 +9,12 @@ import { z } from "zod";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { applyStructuralRules } from "../src/lib/rules";
 
-type Task = { labels: string[]; forward_to?: string; forwardTo?: string };
+// TEMPORARY (Task 6): the classifier now emits a single `category` id per task and no
+// per-task forward_to (see src/lib/classify.ts); the golden dataset.json still uses the
+// old label/forward_to shape until Task 11 refreshes it to the office-config taxonomy.
+// Accept both shapes so this keeps compiling and produces sane (if imperfect) scores.
+type Task = { category?: string; labels?: string[]; forward_to?: string; forwardTo?: string };
+const taskLabels = (t: Task): string[] => (t.category ? [t.category] : t.labels ?? []);
 
 // The blind test treats the two USLI renewal-quote labels as one category (both are
 // dispatcher-accepted); mirror that here so the metric measures real disagreement.
@@ -19,7 +24,7 @@ function canon(labels: string[]): string[] {
   ).sort();
 }
 
-const labelUnion = (tasks: Task[]) => canon([...new Set((tasks ?? []).flatMap((t) => t.labels ?? []))]);
+const labelUnion = (tasks: Task[]) => canon([...new Set((tasks ?? []).flatMap(taskLabels))]);
 const forwardSet = (tasks: Task[]) =>
   [...new Set((tasks ?? []).map((t) => t.forward_to ?? t.forwardTo).filter((f) => f && f !== "none"))].sort();
 
@@ -46,7 +51,7 @@ export function forwardMatch(run: any, example: any) {
 // Measures the MODEL's instruction-following on the co-emit rule specifically —
 // deliberately checks the raw output, before applyStructuralRules would patch it.
 export function coEmitCompliance(run: any, _example: any) {
-  const raw = [...new Set(((run.outputs?.tasks ?? []) as Task[]).flatMap((t) => t.labels ?? []))];
+  const raw = [...new Set(((run.outputs?.tasks ?? []) as Task[]).flatMap(taskLabels))];
   if (!raw.includes("Cancelllation")) return { key: "co_emit_compliance", score: 1, comment: "n/a (no Cancelllation)" };
   const ok = raw.includes("3-KR/DOCS&NOTICE");
   return { key: "co_emit_compliance", score: ok ? 1 : 0, comment: ok ? "co-emitted" : "missing 3-KR/DOCS&NOTICE alongside Cancelllation" };

@@ -18,6 +18,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 import { evaluate } from "langsmith/evaluation";
 import { normalize } from "../src/lib/normalize";
 import { makeClassifier } from "../src/lib/classify";
+import { loadOfficeConfig } from "../src/lib/officeConfig";
 import {
   exactSetMatch, taskCountMatch, forwardMatch, coEmitCompliance, latencySeconds,
   faithfulness, instructionFollowing,
@@ -40,7 +41,10 @@ async function ensureDataset(client: Client, sync: boolean): Promise<void> {
 }
 
 async function main() {
-  for (const v of ["LANGSMITH_API_KEY", "GEMINI_API_KEY"]) {
+  // TEMPORARY (Task 6): pinned to the AGY example config until Task 11 makes the
+  // eval office-config-driven and refreshes dataset.json to the new taxonomy.
+  const cfg = loadOfficeConfig(path.join(HERE, "..", "examples/agency/triage.config.json"));
+  for (const v of ["LANGSMITH_API_KEY", cfg.llm.apiKeyEnv]) {
     if (!process.env[v]) { console.error(`${v} is required`); process.exit(1); }
   }
   const args = process.argv.slice(2);
@@ -52,7 +56,7 @@ async function main() {
   const client = new Client();
   await ensureDataset(client, sync);
 
-  const classifier = makeClassifier();
+  const classifier = makeClassifier(cfg, []);
   const target = async (inputs: Record<string, any>) => {
     const email = normalize({
       threadId: inputs.threadId, from: inputs.from, to: [], subject: inputs.subject,
@@ -69,7 +73,7 @@ async function main() {
 
   let promptVersion = "unversioned";
   try { promptVersion = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: path.join(HERE, "..") }).toString().trim(); } catch {}
-  const model = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
+  const model = cfg.llm.model;
 
   const data = limit
     ? client.listExamples({ datasetName: DATASET, limit })

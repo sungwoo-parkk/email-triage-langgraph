@@ -34,26 +34,27 @@ describe("decide", () => {
   });
 
   it("high-confidence LLM output within autoActLabels decides", () => {
-    const d = decide(noRules, { tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "high", rationale: "" }, cfg);
+    const d = decide(noRules, { tasks: [{ category: "4-CAN REQ" }], confidence: "high", rationale: "" }, cfg);
     expect(d.status).toBe("decided");
     expect(d.actionsPlanned).toEqual([{ kind: "labels", labels: ["4-CAN REQ"] }]);
   });
 
   it("medium/low confidence routes to review", () => {
-    const d = decide(noRules, { tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "medium", rationale: "" }, cfg);
+    const d = decide(noRules, { tasks: [{ category: "4-CAN REQ" }], confidence: "medium", rationale: "" }, cfg);
     expect(d.status).toBe("needs_review");
     expect(d.actionsPlanned).toEqual([]);
   });
 
   it("labels outside autoActLabels route to review even at high confidence", () => {
-    const d = decide(noRules, { tasks: [{ labels: ["5-UW"], forward_to: "none" }], confidence: "high", rationale: "" }, cfg);
+    const d = decide(noRules, { tasks: [{ category: "5-UW" }], confidence: "high", rationale: "" }, cfg);
     expect(d.status).toBe("needs_review");
   });
 
-  it("applies the structural co-emit and plans forwards per task", () => {
-    const d = decide(noRules, { tasks: [{ labels: ["Cancelllation"], forward_to: "invoice@agency.example" }], confidence: "high", rationale: "" }, cfg);
+  // NOTE: per-task forward_to no longer exists on Classification (Task 6 rewrite);
+  // forwarding-from-LLM-output is reintroduced properly in Task 7 via office routing.
+  it("applies the structural co-emit", () => {
+    const d = decide(noRules, { tasks: [{ category: "Cancelllation" }], confidence: "high", rationale: "" }, cfg);
     expect(d.tasks[0].labels).toContain("3-KR/DOCS&NOTICE");
-    expect(d.actionsPlanned).toContainEqual({ kind: "forward", to: "invoice@agency.example" });
   });
 
   it("null LLM output (classifier failure) routes to review", () => {
@@ -66,7 +67,7 @@ describe("decide", () => {
   it("merges rule-partial labels and blocks auto-act when merged label is outside allowlist", () => {
     const partialRule = { hits: [{id: 1} as any], labels: ["Billing"], forwards: [], complete: false };
     const cfgNoAllowBilling = { stage: "shadow" as const, autoActLabels: ["4-CAN REQ"] };
-    const d = decide(partialRule, { tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "high", rationale: "" }, cfgNoAllowBilling);
+    const d = decide(partialRule, { tasks: [{ category: "4-CAN REQ" }], confidence: "high", rationale: "" }, cfgNoAllowBilling);
     expect(d.tasks[0].labels).toContain("4-CAN REQ");
     expect(d.tasks[0].labels).toContain("Billing");
     expect(d.status).toBe("needs_review");
@@ -76,7 +77,7 @@ describe("decide", () => {
   it("merges rule-partial labels and allows auto-act when all merged labels allowed", () => {
     const partialRule = { hits: [{id: 1} as any], labels: ["Billing"], forwards: [], complete: false };
     const cfgAllowBilling = { stage: "shadow" as const, autoActLabels: ["4-CAN REQ", "Billing"] };
-    const d = decide(partialRule, { tasks: [{ labels: ["4-CAN REQ"], forward_to: "none" }], confidence: "high", rationale: "" }, cfgAllowBilling);
+    const d = decide(partialRule, { tasks: [{ category: "4-CAN REQ" }], confidence: "high", rationale: "" }, cfgAllowBilling);
     expect(d.status).toBe("decided");
     expect(d.actionsPlanned).toContainEqual({ kind: "labels", labels: expect.arrayContaining(["4-CAN REQ", "Billing"]) });
   });

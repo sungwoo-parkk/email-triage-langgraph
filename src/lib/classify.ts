@@ -1,44 +1,38 @@
 import { z } from "zod";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { CLASSIFIABLE_LABELS, DESK_ALIASES } from "./labels";
+import type { OfficeConfig } from "./officeConfig";
+import { deriveVocabulary } from "./officeConfig";
 import type { NormalizedEmail } from "./normalize";
 import type { RuleOutcome } from "./rules";
-import { TAXONOMY_PROMPT, emailPrompt } from "./prompt";
+import { buildSystemPrompt, emailPrompt, type Exemplar } from "./promptgen";
 
-const labelEnum = z.enum(CLASSIFIABLE_LABELS as [string, ...string[]]);
-const forwardEnum = z.enum([...DESK_ALIASES, "none"] as [string, ...string[]]);
-
-export const ClassificationSchema = z.object({
-  tasks: z.array(z.object({ labels: z.array(labelEnum).min(1), forward_to: forwardEnum })).min(1),
-  confidence: z.enum(["high", "medium", "low"]),
-  rationale: z.string(),
-});
-export type Classification = z.infer<typeof ClassificationSchema>;
-
-export interface ClassifierModel {
-  invoke(messages: [string, string][]): Promise<unknown>;
-}
-
-function defaultModel(): ClassifierModel {
-  const llm = new ChatGoogleGenerativeAI({
-    model: process.env.GEMINI_MODEL ?? "gemini-3.6-flash",
-    temperature: 0,
-    apiKey: process.env.GEMINI_API_KEY,
+export function makeClassificationSchema(cfg: OfficeConfig) {
+  const ids = deriveVocabulary(cfg).categoryIds as [string, ...string[]];
+  return z.object({
+    tasks: z.array(z.object({ category: z.enum(ids) })).min(1),
+    confidence: z.enum(["high", "medium", "low"]),
+    rationale: z.string(),
   });
-  return llm.withStructuredOutput(ClassificationSchema) as unknown as ClassifierModel;
+}
+export type Classification = z.infer<ReturnType<typeof makeClassificationSchema>>;
+
+export interface ClassifierModel { invoke(messages: [string, string][]): Promise<unknown> }
+
+async function defaultModel(cfg: OfficeConfig, schema: ReturnType<typeof makeClassificationSchema>): Promise<ClassifierModel> {
+  const { initChatModel } = await import("langchain/chat_models/universal");
+  const apiKey = process.env[cfg.llm.apiKeyEnv];
+  if (!apiKey) throw new Error(`${cfg.llm.apiKeyEnv} is not set (required by llm.model=${cfg.llm.model})`);
+  const llm = await initChatModel(cfg.llm.model, { temperature: 0, apiKey });
+  return llm.withStructuredOutput(schema) as unknown as ClassifierModel;
 }
 
-export function makeClassifier(model?: ClassifierModel) {
-  const m = model ?? defaultModel();
+export function makeClassifier(cfg: OfficeConfig, exemplars: Exemplar[], model?: ClassifierModel) {
+  const schema = makeClassificationSchema(cfg);
+  const system = buildSystemPrompt(cfg, exemplars);
+  let m: ClassifierModel | undefined = model;
   return async (email: NormalizedEmail, ruleEvidence: RuleOutcome): Promise<Classification> => {
-    const messages: [string, string][] = [
-      ["system", TAXONOMY_PROMPT],
-      ["human", emailPrompt(email, ruleEvidence)],
-    ];
-    try {
-      return ClassificationSchema.parse(await m.invoke(messages));
-    } catch {
-      return ClassificationSchema.parse(await m.invoke(messages)); // one retry, then throw
-    }
+    m ??= await defaultModel(cfg, schema);
+    const messages: [string, string][] = [["system", system], ["human", emailPrompt(email, ruleEvidence)]];
+    try { return schema.parse(await m.invoke(messages)); }
+    catch { return schema.parse(await m.invoke(messages)); } // one retry, then throw
   };
 }

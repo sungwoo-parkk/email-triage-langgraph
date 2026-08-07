@@ -37,10 +37,11 @@ function fakeGmail() {
   return { g, calls };
 }
 
+// NOTE: Classification.tasks no longer carries forward_to (Task 6 rewrite); a complete
+// rule hit gives an equivalent labels+forward decision without depending on the LLM shape.
 const highDecision = () =>
-  decide({ hits: [], labels: [], forwards: [], complete: false },
-    { tasks: [{ labels: ["4-CAN REQ"], forward_to: "invoice@agency.example" }], confidence: "high", rationale: "" },
-    { stage: "shadow", autoActLabels: ["4-CAN REQ", "3-KR/DOCS&NOTICE"] });
+  decide({ hits: [], labels: ["4-CAN REQ"], forwards: ["invoice@agency.example"], complete: true }, null,
+    { stage: "shadow", autoActLabels: [] });
 
 async function seed(threadId: string) {
   const email = normalize({ threadId, from: "a@b.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "", internalDateMs: 1, references: [] });

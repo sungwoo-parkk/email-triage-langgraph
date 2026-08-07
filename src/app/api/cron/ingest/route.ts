@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { makeGmail } from "@/lib/mail/gmail";
 import { makeClassifier } from "@/lib/classify";
+import { getOfficeConfig } from "@/lib/officeConfig";
 import { buildTriageGraph } from "@/graph/triage";
 import { getConfig } from "@/lib/config";
 import { runIngestBatch } from "@/lib/ingest";
@@ -13,8 +14,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const db = getDb();
+  const officeCfg = await getOfficeConfig(db);
+  if (!officeCfg) return NextResponse.json({ error: "office not configured" }, { status: 500 });
   const gmail = makeGmail();
-  const graph = buildTriageGraph({ db, gmail, classify: makeClassifier() });
+  const graph = buildTriageGraph({ db, gmail, classify: makeClassifier(officeCfg, []) });
 
   const { rows } = await db.query(`select checkpoint_ms from ingest_state where id = 1`);
   const checkpoint = Number(rows[0].checkpoint_ms);

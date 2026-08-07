@@ -27,9 +27,12 @@ export function decide(rule: RuleOutcome, llm: Classification | null, cfg: AppCo
   }
   if (!llm) return { tasks: [], confidence: "low", status: "needs_review", actionsPlanned: [] };
 
+  // TEMPORARY (Task 6 minimal compile-fix): Classification.tasks now carry a single
+  // `category` id and no per-task forward_to (Task 7 rewrites decide() around the
+  // office vocabulary's routeFor(category) for real forwarding).
   const tasks: TriageTask[] = llm.tasks.map((t) => ({
-    labels: applyStructuralRules([...new Set([...t.labels, ...rule.labels])]),
-    forwardTo: t.forward_to === "none" ? null : t.forward_to,
+    labels: applyStructuralRules([...new Set([t.category, ...rule.labels])]),
+    forwardTo: null,
   }));
   const allowed = new Set(cfg.autoActLabels);
   const eligible = llm.confidence === "high" && tasks.every((t) => t.labels.every((l) => allowed.has(l)));

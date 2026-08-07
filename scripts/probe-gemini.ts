@@ -1,7 +1,12 @@
+import { loadOfficeConfig } from "../src/lib/officeConfig";
 import { makeClassifier } from "../src/lib/classify";
 
+// TEMPORARY (Task 6): pinned to the AGY example config; Task 11 makes CLI scripts
+// office-config-driven (path/office picked at the command line).
+const cfg = loadOfficeConfig("examples/agency/triage.config.json");
+
 async function main() {
-  const classify = makeClassifier();
+  const classify = makeClassifier(cfg, []);
   const result = await classify(
     { threadId: "probe", fromAddr: "vicky@oakmontins.com", fromDomain: "oakmontins.com", to: [],
       subject: "cancellation request for MY NY Leading Company LLC", listId: null,
@@ -13,4 +18,4 @@ async function main() {
   console.log("PROBE OK:", JSON.stringify(result, null, 2));
   if (result.tasks.length < 2) console.warn("NOTE: expected 2 tasks (endorsement + cancellation) — check prompt quality");
 }
-main().catch((e) => { console.error("PROBE FAILED (check GEMINI_MODEL id / GEMINI_API_KEY):", e.message); process.exit(1); });
+main().catch((e) => { console.error(`PROBE FAILED (check llm.model / ${cfg.llm.apiKeyEnv}):`, e.message); process.exit(1); });
