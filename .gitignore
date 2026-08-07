@@ -57,3 +57,6 @@ __pycache__/
 .agents/
 .claude/
 skills-lock.json
+
+# triage CLI onboarding artifacts (mined rules, exemplars, holdout, eval, HTML report)
+.triage/

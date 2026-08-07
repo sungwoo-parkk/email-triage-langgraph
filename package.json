@@ -14,7 +14,8 @@
     "probe-gmail": "npx tsx --env-file=.env scripts/probe-gmail.ts",
     "probe-gemini": "npx tsx --env-file=.env scripts/probe-gemini.ts",
     "authorize-gmail": "npx tsx --env-file=.env scripts/authorize-gmail.ts",
-    "eval-blindtest": "npx tsx --env-file=.env scripts/eval-blindtest.ts"
+    "eval-blindtest": "npx tsx --env-file=.env scripts/eval-blindtest.ts",
+    "triage": "npx tsx --env-file-if-exists=.env src/cli/main.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.2.5",
