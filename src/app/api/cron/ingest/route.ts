@@ -6,6 +6,7 @@ import { getOfficeConfig } from "@/lib/officeConfig";
 import { buildTriageGraph } from "@/graph/triage";
 import { getConfig } from "@/lib/config";
 import { runIngestBatch } from "@/lib/ingest";
+import { observeSentMail } from "@/lib/observer";
 
 export const maxDuration = 300;
 
@@ -30,5 +31,10 @@ export async function GET(req: Request) {
   await db.query(
     `update ingest_state set checkpoint_ms = $1, last_success_at = now() where id = 1`, [checkpointMs]
   );
-  return NextResponse.json({ processed, checkpoint: checkpointMs, failures });
+
+  let observer: { corrections: number; promoted: number } | { error: string };
+  try { observer = await observeSentMail(db, gmail, officeCfg, Date.now()); }
+  catch (e) { observer = { error: e instanceof Error ? e.message : String(e) }; }
+
+  return NextResponse.json({ processed, checkpoint: checkpointMs, failures, observer });
 }
