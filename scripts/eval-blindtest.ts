@@ -31,8 +31,8 @@ async function main() {
     const batch = JSON.parse(readFileSync(`phase0/analysis/blindtest/batch-${b}.json`, "utf8"));
     for (const r of batch) {
       const email = normalize({
-        threadId: r.threadId, from: r.from ?? "", subject: r.subject ?? "",
-        listId: r.listId ?? null, attachments: r.attachments ?? [], bodyText: r.body ?? "", internalDateMs: 0,
+        threadId: r.threadId, from: r.from ?? "", to: [], subject: r.subject ?? "",
+        listId: r.listId ?? null, attachments: r.attachments ?? [], bodyText: r.body ?? "", internalDateMs: 0, references: [],
       });
       const c = await classify(email, { hits: [], labels: [], forwards: [], complete: false });
       const labels = [...new Set(c.tasks.flatMap((t) => t.labels))];

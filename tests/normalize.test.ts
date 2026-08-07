@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { normalize, extractAddr } from "@/lib/normalize";
 
 const base = {
-  threadId: "t1", from: "Jane Doe <JANE@Acme.com>", subject: "[EXTERNAL] cancellation request",
+  threadId: "t1", from: "Jane Doe <JANE@Acme.com>", to: [], subject: "[EXTERNAL] cancellation request",
   listId: null, attachments: ["BOP-LPR-signed.pdf"],
   bodyText: "Please  cancel\r\n\r\n\r\nthe policy.  " + "x".repeat(3000),
-  internalDateMs: 1_754_400_000_000,
+  internalDateMs: 1_754_400_000_000, references: [],
 };
 
 describe("normalize", () => {

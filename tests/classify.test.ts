@@ -3,9 +3,9 @@ import { makeClassifier, ClassificationSchema } from "@/lib/classify";
 import { normalize } from "@/lib/normalize";
 
 const email = normalize({
-  threadId: "t", from: "vicky@oakmont.com", subject: "cancellation request",
+  threadId: "t", from: "vicky@oakmont.com", to: [], subject: "cancellation request",
   listId: null, attachments: ["LPR.pdf"], bodyText: "Please cancel effective 6/30 and update mailing address.",
-  internalDateMs: 0,
+  internalDateMs: 0, references: [],
 });
 const noRules = { hits: [], labels: [], forwards: [], complete: false };
 

@@ -1,6 +1,6 @@
 import { google, type gmail_v1 } from "googleapis";
 import { randomBytes } from "node:crypto";
-import type { ThreadSnapshot } from "./normalize";
+import type { MailClient, ThreadSnapshot } from "./types";
 
 export function buildQuery(sinceMs: number): string {
   return `after:${Math.floor(sinceMs / 1000) - 1} -in:spam -in:trash`;
@@ -44,79 +44,139 @@ function authClient() {
   });
 }
 
-export interface GmailClient {
-  listNewThreads(sinceMs: number): Promise<ThreadSnapshot[]>;
-  applyLabels(threadId: string, labelNames: string[]): Promise<void>;
-  forward(threadId: string, to: string): Promise<void>;
-  sendAlert(to: string, subject: string, body: string): Promise<void>;
+function monthsAgoQuery(months: number, sent?: boolean): string {
+  const sinceMs = Date.now() - months * 30 * 86_400_000;
+  const q = `after:${Math.floor(sinceMs / 1000)}`;
+  return sent ? `in:sent ${q}` : q;
 }
 
-export function makeGmail(api?: gmail_v1.Gmail): GmailClient {
+export function makeGmail(api?: gmail_v1.Gmail): MailClient {
   const gmail = api ?? google.gmail({ version: "v1", auth: authClient() });
   let labelMap: Map<string, string> | null = null; // name -> id
 
-  async function labelIds(names: string[]): Promise<string[]> {
+  async function loadLabelMap(): Promise<Map<string, string>> {
     if (!labelMap) {
       const { data } = await gmail.users.labels.list({ userId: "me" });
       labelMap = new Map((data.labels ?? []).map((l) => [l.name!, l.id!]));
     }
+    return labelMap;
+  }
+
+  async function labelIds(names: string[]): Promise<string[]> {
+    const map = await loadLabelMap();
     return names.map((n) => {
-      const id = labelMap!.get(n);
+      const id = map.get(n);
       if (!id) throw new Error(`unknown Gmail label: ${n}`);
       return id;
     });
   }
 
+  function headerOf(payload: gmail_v1.Schema$MessagePart | undefined, name: string): string {
+    return (
+      payload?.headers?.find((x) => x.name?.toLowerCase() === name.toLowerCase())?.value ?? ""
+    );
+  }
+
+  function snapshotFromThread(threadId: string, thread: gmail_v1.Schema$Thread, opts?: { sent?: boolean }): ThreadSnapshot | null {
+    const messages = thread.messages ?? [];
+    const msg = opts?.sent ? messages[messages.length - 1] : messages[0];
+    if (!msg) return null;
+    return {
+      threadId,
+      from: headerOf(msg.payload, "From"),
+      to: headerOf(msg.payload, "To").split(/\s*,\s*/).filter(Boolean),
+      subject: headerOf(msg.payload, "Subject"),
+      listId: headerOf(msg.payload, "List-Id") || null,
+      attachments: collectFilenames(msg.payload),
+      bodyText: collectText(msg.payload),
+      internalDateMs: Number(msg.internalDate ?? 0),
+      references: headerOf(msg.payload, "References").split(/\s+/).filter(Boolean),
+    };
+  }
+
   return {
-    async listNewThreads(sinceMs) {
+    async listNewThreads(sinceMs, opts) {
       const out: ThreadSnapshot[] = [];
       let pageToken: string | undefined;
+      const q = opts?.sent ? `in:sent ${buildQuery(sinceMs)}` : buildQuery(sinceMs);
       do {
         const { data } = await gmail.users.threads.list({
-          userId: "me", q: buildQuery(sinceMs), maxResults: 100, pageToken,
+          userId: "me", q, maxResults: 100, pageToken,
         });
         for (const t of data.threads ?? []) {
           const { data: full } = await gmail.users.threads.get({ userId: "me", id: t.id!, format: "full" });
-          const first = full.messages?.[0];
-          if (!first) continue;
-          const h = (name: string) =>
-            first.payload?.headers?.find((x) => x.name?.toLowerCase() === name.toLowerCase())?.value ?? "";
-          out.push({
-            threadId: t.id!,
-            from: h("From"),
-            subject: h("Subject"),
-            listId: h("List-Id") || null,
-            attachments: collectFilenames(first.payload),
-            bodyText: collectText(first.payload),
-            internalDateMs: Number(first.internalDate ?? 0),
-          });
+          const snap = snapshotFromThread(t.id!, full, opts);
+          if (snap) out.push(snap);
         }
         pageToken = data.nextPageToken ?? undefined;
       } while (pageToken);
       return out;
     },
 
-    async applyLabels(threadId, labelNames) {
+    async *listHistory(opts) {
+      let pageToken: string | undefined;
+      let yielded = 0;
+      const q = monthsAgoQuery(opts.months, opts.sent);
+      do {
+        const { data } = await gmail.users.threads.list({
+          userId: "me", q, maxResults: 100, pageToken,
+        });
+        for (const t of data.threads ?? []) {
+          if (yielded >= opts.maxThreads) return;
+          const { data: full } = await gmail.users.threads.get({ userId: "me", id: t.id!, format: "full" });
+          const snap = snapshotFromThread(t.id!, full, opts);
+          if (snap) {
+            yield snap;
+            yielded++;
+          }
+        }
+        pageToken = data.nextPageToken ?? undefined;
+      } while (pageToken && yielded < opts.maxThreads);
+    },
+
+    async ensureCategories(names) {
+      const map = await loadLabelMap();
+      for (const name of names) {
+        if (map.has(name)) continue;
+        try {
+          const { data } = await gmail.users.labels.create({
+            userId: "me", requestBody: { name, labelListVisibility: "labelShow", messageListVisibility: "show" },
+          });
+          map.set(name, data.id!);
+        } catch (e: unknown) {
+          // 409/duplicate: another actor created it concurrently — treat as success.
+          const code = (e as { code?: number; status?: number })?.code ?? (e as { status?: number })?.status;
+          const message = e instanceof Error ? e.message : String(e);
+          if (code === 409 || /duplicate/i.test(message)) {
+            const { data } = await gmail.users.labels.list({ userId: "me" });
+            labelMap = new Map((data.labels ?? []).map((l) => [l.name!, l.id!]));
+          } else {
+            throw e;
+          }
+        }
+      }
+    },
+
+    async applyCategories(threadId, names) {
       await gmail.users.threads.modify({
-        userId: "me", id: threadId, requestBody: { addLabelIds: await labelIds(labelNames) },
+        userId: "me", id: threadId, requestBody: { addLabelIds: await labelIds(names) },
       });
     },
 
-    async forward(threadId, to) {
+    async forward(threadId, to, contextBody) {
       const { data: full } = await gmail.users.threads.get({ userId: "me", id: threadId, format: "full" });
       const first = full.messages?.[0];
       if (!first?.id) throw new Error(`thread ${threadId} has no messages`);
       const { data: rawMsg } = await gmail.users.messages.get({ userId: "me", id: first.id, format: "raw" });
-      const subject =
-        first.payload?.headers?.find((x) => x.name?.toLowerCase() === "subject")?.value ?? "(no subject)";
+      const subject = headerOf(first.payload, "Subject") || "(no subject)";
       const raw = buildForwardRaw({
         to, from: process.env.GMAIL_USER!, subject: `Fwd: ${subject}`,
-        comment: "Auto-forwarded by triage.", originalRawB64url: rawMsg.raw!,
+        comment: contextBody, originalRawB64url: rawMsg.raw!,
       });
       await gmail.users.messages.send({ userId: "me", requestBody: { raw, threadId } });
     },
 
-    async sendAlert(to, subject, body) {
+    async sendMessage(to, subject, body) {
       const mime = [`From: ${process.env.GMAIL_USER}`, `To: ${to}`, `Subject: ${subject}`, "", body].join("\r\n");
       await gmail.users.messages.send({
         userId: "me", requestBody: { raw: Buffer.from(mime, "utf8").toString("base64url") },

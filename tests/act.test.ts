@@ -5,7 +5,7 @@ import { runMigrations } from "@/lib/migrate";
 import { executeDecision } from "@/lib/act";
 import { recordDecision, decide } from "@/lib/decide";
 import { normalize } from "@/lib/normalize";
-import type { GmailClient } from "@/lib/gmail";
+import type { MailClient } from "@/lib/mail/types";
 
 function pgliteAdapter(p: PGlite): Querier {
   return {
@@ -26,11 +26,13 @@ function pgliteAdapter(p: PGlite): Querier {
 
 function fakeGmail() {
   const calls: string[] = [];
-  const g: GmailClient = {
+  const g: MailClient = {
     listNewThreads: async () => [],
-    applyLabels: async (id, labels) => { calls.push(`labels:${id}:${labels.sort().join("|")}`); },
+    listHistory: async function* () {},
+    ensureCategories: async () => {},
+    applyCategories: async (id, labels) => { calls.push(`labels:${id}:${labels.sort().join("|")}`); },
     forward: async (id, to) => { calls.push(`forward:${id}:${to}`); },
-    sendAlert: async () => { calls.push("alert"); },
+    sendMessage: async () => { calls.push("alert"); },
   };
   return { g, calls };
 }
@@ -41,7 +43,7 @@ const highDecision = () =>
     { stage: "shadow", autoActLabels: ["4-CAN REQ", "3-KR/DOCS&NOTICE"] });
 
 async function seed(threadId: string) {
-  const email = normalize({ threadId, from: "a@b.com", subject: "s", listId: null, attachments: [], bodyText: "", internalDateMs: 1 });
+  const email = normalize({ threadId, from: "a@b.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "", internalDateMs: 1, references: [] });
   return recordDecision(getDb(), email, { hits: [], labels: [], forwards: [], complete: false }, null, highDecision(), "test");
 }
 
@@ -81,9 +83,10 @@ describe("executeDecision", () => {
 
   it("a failing forward marks the decision failed but keeps executed labels recorded", async () => {
     const id = await seed("s4");
-    const g: GmailClient = {
-      listNewThreads: async () => [], applyLabels: async () => {},
-      forward: async () => { throw new Error("smtp down"); }, sendAlert: async () => {},
+    const g: MailClient = {
+      listNewThreads: async () => [], listHistory: async function* () {}, ensureCategories: async () => {},
+      applyCategories: async () => {},
+      forward: async () => { throw new Error("smtp down"); }, sendMessage: async () => {},
     };
     await executeDecision(getDb(), g, id, { stage: "autonomous", autoActLabels: [] });
     const { rows } = await getDb().query(`select status, actions_executed, error_detail from decisions where id=$1`, [id]);

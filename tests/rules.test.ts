@@ -11,7 +11,7 @@ const rules: Rule[] = [
 ];
 
 function email(from: string, subject = "hello", listId: string | null = null) {
-  return normalize({ threadId: "t", from, subject, listId, attachments: [], bodyText: "", internalDateMs: 0 });
+  return normalize({ threadId: "t", from, to: [], subject, listId, attachments: [], bodyText: "", internalDateMs: 0, references: [] });
 }
 
 describe("matchRules", () => {

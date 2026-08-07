@@ -4,7 +4,7 @@ import { setDb, getDb, type Querier } from "@/lib/db";
 import { runMigrations } from "@/lib/migrate";
 import { buildTriageGraph } from "@/graph/triage";
 import { normalize } from "@/lib/normalize";
-import type { GmailClient } from "@/lib/gmail";
+import type { MailClient } from "@/lib/mail/types";
 
 // PGlite's parameterized query() rejects multi-statement SQL (our migration files
 // contain several `create table` statements per file), so DDL and RETURNING-less
@@ -25,13 +25,14 @@ function pgliteAdapter(p: PGlite): Querier {
   };
 }
 
-const silentGmail: GmailClient = {
-  listNewThreads: async () => [], applyLabels: async () => { throw new Error("must not act in shadow"); },
-  forward: async () => { throw new Error("must not act in shadow"); }, sendAlert: async () => {},
+const silentGmail: MailClient = {
+  listNewThreads: async () => [], listHistory: async function* () {}, ensureCategories: async () => {},
+  applyCategories: async () => { throw new Error("must not act in shadow"); },
+  forward: async () => { throw new Error("must not act in shadow"); }, sendMessage: async () => {},
 };
 
 function email(threadId: string, from: string, subject: string, body: string) {
-  return normalize({ threadId, from, subject, listId: null, attachments: [], bodyText: body, internalDateMs: 10 });
+  return normalize({ threadId, from, to: [], subject, listId: null, attachments: [], bodyText: body, internalDateMs: 10, references: [] });
 }
 
 describe("triage graph (shadow stage)", () => {

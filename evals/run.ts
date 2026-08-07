@@ -55,9 +55,9 @@ async function main() {
   const classifier = makeClassifier();
   const target = async (inputs: Record<string, any>) => {
     const email = normalize({
-      threadId: inputs.threadId, from: inputs.from, subject: inputs.subject,
+      threadId: inputs.threadId, from: inputs.from, to: [], subject: inputs.subject,
       listId: inputs.listId ?? null, attachments: inputs.attachments ?? [],
-      bodyText: inputs.body ?? "", internalDateMs: 0,
+      bodyText: inputs.body ?? "", internalDateMs: 0, references: [],
     });
     const t0 = Date.now();
     const c = await classifier(email, { hits: [], labels: [], forwards: [], complete: false });

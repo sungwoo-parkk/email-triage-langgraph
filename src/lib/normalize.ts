@@ -1,22 +1,17 @@
-export interface ThreadSnapshot {
-  threadId: string;
-  from: string;
-  subject: string;
-  listId: string | null;
-  attachments: string[];
-  bodyText: string;
-  internalDateMs: number;
-}
+export type { ThreadSnapshot } from "./mail/types";
+import type { ThreadSnapshot } from "./mail/types";
 
 export interface NormalizedEmail {
   threadId: string;
   fromAddr: string;
   fromDomain: string;
+  to: string[];
   subject: string;
   listId: string | null;
   attachments: string[];
   bodyExcerpt: string;
   internalDateMs: number;
+  references: string[];
 }
 
 const BODY_CHARS = 1200;
@@ -36,10 +31,12 @@ export function normalize(s: ThreadSnapshot): NormalizedEmail {
     threadId: s.threadId,
     fromAddr,
     fromDomain: fromAddr.includes("@") ? fromAddr.split("@").pop()! : fromAddr,
+    to: s.to ?? [],
     subject: s.subject,
     listId: s.listId,
     attachments: s.attachments,
     bodyExcerpt: cleanBody(s.bodyText).slice(0, BODY_CHARS),
     internalDateMs: s.internalDateMs,
+    references: s.references ?? [],
   };
 }

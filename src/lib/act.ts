@@ -1,5 +1,5 @@
 import type { Querier } from "./db";
-import type { GmailClient } from "./gmail";
+import type { MailClient } from "./mail/types";
 import type { Action } from "./decide";
 import type { AppConfig } from "./config";
 
@@ -12,7 +12,7 @@ function permitted(action: Action, stage: AppConfig["stage"]): boolean {
 const keyOf = (a: Action) => JSON.stringify(a);
 
 export async function executeDecision(
-  db: Querier, gmail: GmailClient, decisionId: number, cfg: AppConfig
+  db: Querier, gmail: MailClient, decisionId: number, cfg: AppConfig
 ): Promise<void> {
   const { rows } = await db.query(
     `select thread_id, status, actions_planned, actions_executed from decisions where id = $1`, [decisionId]
@@ -27,8 +27,8 @@ export async function executeDecision(
   for (const action of planned) {
     if (!permitted(action, cfg.stage) || done.has(keyOf(action))) continue;
     try {
-      if (action.kind === "labels") await gmail.applyLabels(row.thread_id, action.labels);
-      else await gmail.forward(row.thread_id, action.to);
+      if (action.kind === "labels") await gmail.applyCategories(row.thread_id, action.labels);
+      else await gmail.forward(row.thread_id, action.to, "");
       executed.push(action);
       // record immediately after success: a crash between actions can only skip, never repeat
       await db.query(`update decisions set actions_executed = $2 where id = $1`,

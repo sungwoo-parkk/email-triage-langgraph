@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { makeGmail } from "@/lib/gmail";
+import { makeGmail } from "@/lib/mail/gmail";
 import { makeClassifier } from "@/lib/classify";
 import { buildTriageGraph } from "@/graph/triage";
 import { getConfig } from "@/lib/config";

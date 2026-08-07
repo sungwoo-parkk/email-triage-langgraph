@@ -1,6 +1,6 @@
 import { StateGraph, Annotation, START, END } from "@langchain/langgraph";
 import type { Querier } from "@/lib/db";
-import type { GmailClient } from "@/lib/gmail";
+import type { MailClient } from "@/lib/mail/types";
 import type { NormalizedEmail } from "@/lib/normalize";
 import { loadActiveRules, matchRules, type RuleOutcome } from "@/lib/rules";
 import type { Classification } from "@/lib/classify";
@@ -19,7 +19,7 @@ const TriageState = Annotation.Root({
 
 export function buildTriageGraph(deps: {
   db: Querier;
-  gmail: GmailClient;
+  gmail: MailClient;
   classify: (e: NormalizedEmail, r: RuleOutcome) => Promise<Classification>;
 }) {
   const graph = new StateGraph(TriageState)

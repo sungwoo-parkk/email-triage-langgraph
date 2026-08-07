@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildQuery, buildForwardRaw } from "@/lib/gmail";
+import { buildQuery, buildForwardRaw } from "@/lib/mail/gmail";
 
 describe("buildQuery", () => {
   it("converts ms checkpoint to epoch-seconds after: with 1s overlap", () => {

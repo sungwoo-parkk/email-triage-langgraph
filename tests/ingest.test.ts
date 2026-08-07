@@ -25,7 +25,7 @@ function pgliteAdapter(p: PGlite): Querier {
 }
 
 function snap(threadId: string, internalDateMs: number): ThreadSnapshot {
-  return { threadId, from: "a@b.com", subject: "s", listId: null, attachments: [], bodyText: "body", internalDateMs };
+  return { threadId, from: "a@b.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "body", internalDateMs, references: [] };
 }
 
 describe("runIngestBatch", () => {

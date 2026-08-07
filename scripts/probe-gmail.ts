@@ -1,4 +1,4 @@
-import { makeGmail } from "../src/lib/gmail";
+import { makeGmail } from "../src/lib/mail/gmail";
 
 async function main() {
   const gmail = makeGmail();

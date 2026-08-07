@@ -90,7 +90,7 @@ describe("recordDecision", () => {
   });
 
   it("upserts thread and writes a decision row", async () => {
-    const email = normalize({ threadId: "t9", from: "a@b.com", subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5 });
+    const email = normalize({ threadId: "t9", from: "a@b.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5, references: [] });
     const d = decide(noRules, null, cfg);
     const id = await recordDecision(getDb(), email, noRules, null, d, "shadow");
     const { rows } = await getDb().query(`select * from decisions where id = $1`, [id]);
@@ -101,7 +101,7 @@ describe("recordDecision", () => {
   });
 
   it("round-trips confidence 'rule' for complete-rule decision", async () => {
-    const email = normalize({ threadId: "t-rule", from: "rule@example.com", subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5 });
+    const email = normalize({ threadId: "t-rule", from: "rule@example.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5, references: [] });
     const completeRule = { hits: [{id: 1} as any], labels: ["3-KR"], forwards: [], complete: true };
     const d = decide(completeRule, null, cfg);
     const id = await recordDecision(getDb(), email, completeRule, null, d, "shadow");
@@ -110,7 +110,7 @@ describe("recordDecision", () => {
   });
 
   it("threads upsert is idempotent (calling recordDecision twice does not throw)", async () => {
-    const email = normalize({ threadId: "t-idempotent", from: "test@example.com", subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5 });
+    const email = normalize({ threadId: "t-idempotent", from: "test@example.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: 5, references: [] });
     const d = decide(noRules, null, cfg);
     const id1 = await recordDecision(getDb(), email, noRules, null, d, "shadow");
     const id2 = await recordDecision(getDb(), email, noRules, null, d, "shadow");
