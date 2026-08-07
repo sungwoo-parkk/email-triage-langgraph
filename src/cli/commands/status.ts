@@ -1,9 +1,14 @@
 import type { CliArgs } from "../main";
 import { getDb, type Querier } from "../../lib/db";
 import { getConfig } from "../../lib/config";
-import { PROMOTION_FLOOR } from "../steps/mine";
 
 const pct = (n: number) => `${Math.round(n * 100)}%`;
+
+// Promotion gates are two DIFFERENT metrics at two different stages — never conflate them with
+// each other or with mine.ts's EVAL_FLOOR (that one gates the onboarding report, not staging).
+// Spec: docs/superpowers/specs/2026-08-05-email-triage-design.md §5.
+const PROMOTION_GATE_AGREEMENT = 0.85; // shadow -> assisted: >=85% exact label-set agreement, sustained
+const ASSISTED_CORRECTION_RATE_GATE = 0.05; // assisted -> autonomous: <5% correction rate on auto-labels, over 2 weeks
 
 async function loadStatus(db: Querier) {
   const cfg = await getConfig(db);
@@ -33,23 +38,41 @@ export async function run(_args: CliArgs): Promise<void> {
   }
 
   const decided = Object.values(byStatus).reduce((a, b) => a + b, 0);
-  const agreementRate = decided > 0 ? 1 - corrections / decided : null;
-  const gateMet = agreementRate !== null && agreementRate >= PROMOTION_FLOOR;
+  const correctionRate = decided > 0 ? corrections / decided : null;
 
   console.log(`Stage: ${cfg.stage}`);
   console.log(`\nDecisions in the last 7 days:`);
   for (const s of ["decided", "needs_review", "acted", "failed"]) console.log(`  ${s}: ${byStatus[s] ?? 0}`);
   console.log(`  corrections: ${corrections}`);
-
   console.log(
-    agreementRate === null
+    correctionRate === null
       ? `\nNo decisions in the last 7 days yet — nothing to measure.`
-      : `\nAgreement rate (1 - corrections / decisions): ${pct(agreementRate)}`
+      : `\nCorrection rate (corrections / decisions) over the last 7 days: ${pct(correctionRate)}`
   );
 
-  console.log(
-    gateMet
-      ? `\nPromotion gate: MET — agreement is at or above the ${pct(PROMOTION_FLOOR)} bar. "triage promote" is available.`
-      : `\nPromotion gate: NOT met — needs ${pct(PROMOTION_FLOOR)} agreement (measured over at least a week) before promoting past shadow.`
-  );
+  console.log();
+  if (cfg.stage === "shadow") {
+    // Spec defines this gate as agreement, so — and only here — it's fair to read
+    // (1 - correction rate) as an agreement proxy.
+    const agreementRate = correctionRate === null ? null : 1 - correctionRate;
+    const gateMet = agreementRate !== null && agreementRate >= PROMOTION_GATE_AGREEMENT;
+    console.log(`Promotion gate (shadow -> assisted): >= ${pct(PROMOTION_GATE_AGREEMENT)} agreement on high-confidence decisions, sustained over time.`);
+    console.log(
+      agreementRate === null
+        ? `  Not enough data yet to say whether this is met.`
+        : `  Observed over the last 7 days: ${pct(agreementRate)} agreement. ${gateMet ? "MET for this window — sustain it before promoting." : "NOT met."}`
+    );
+  } else if (cfg.stage === "assisted") {
+    // The spec's gate here is a correction rate, not an agreement percentage — do not restate
+    // it as one. Our window (7 days) is also shorter than the spec's (2 weeks), so this stays
+    // informational: no MET/NOT MET verdict.
+    console.log(`Promotion gate (assisted -> autonomous): correction rate below ${pct(ASSISTED_CORRECTION_RATE_GATE)} on auto-applied labels, over two weeks.`);
+    console.log(
+      correctionRate === null
+        ? `  Not enough data yet to say whether this is met.`
+        : `  Observed over the last 7 days: ${corrections} correction(s) / ${decided} decision(s) = ${pct(correctionRate)} correction rate. (The spec measures this over two weeks; this is a shorter sample, so no MET/NOT MET verdict.)`
+    );
+  } else {
+    console.log(`Stage "${cfg.stage}" is the top stage — there is no further promotion gate.`);
+  }
 }

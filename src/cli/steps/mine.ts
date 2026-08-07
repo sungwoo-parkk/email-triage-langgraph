@@ -24,10 +24,13 @@ export interface Artifacts {
   reportHtml: string;
 }
 
-/** Overall-agreement bar the report (and `triage status`'s gate check) holds an office to before
- *  suggesting it's ready to promote past shadow. Kept here since this is where the report is
- *  rendered; status.ts imports it so the two never drift apart. */
-export const PROMOTION_FLOOR = 0.75;
+// Onboarding eval floor: below ~70% overall agreement, deploy proceeds with everything
+// review-only and the report shows a plain warning instead of an auto-route recommendation.
+// This is NOT a promotion gate (those are shadow->assisted ≥85% agreement and
+// assisted->autonomous <5% correction rate, defined in status.ts) — it only decides whether
+// the onboarding report can suggest anything auto-routes on day one.
+// Spec: docs/superpowers/specs/2026-08-07-small-office-triage-design.md §4.
+export const EVAL_FLOOR = 0.7;
 
 const NO_RULES: RuleOutcome = { hits: [], labels: [], forwards: [], complete: false };
 
@@ -114,7 +117,7 @@ export async function runMiningPipeline(
     .slice(0, 8)
     .map((l) => ({ subject: l.email.subject, from: l.email.fromAddr, categoryIds: l.categoryIds }));
 
-  const reportHtml = renderReport({ office: cfg.office.name, evalReport, rules: minedRules, samples, floor: PROMOTION_FLOOR });
+  const reportHtml = renderReport({ office: cfg.office.name, evalReport, rules: minedRules, samples, floor: EVAL_FLOOR });
   log(`Rendered triage-report.html.`);
 
   return { minedRules, exemplars, holdout, evalReport, reportHtml };
