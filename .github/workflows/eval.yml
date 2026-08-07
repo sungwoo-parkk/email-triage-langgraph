@@ -1,0 +1,28 @@
+name: Eval
+
+# Manual-dispatch only: eval runs spend Gemini + LangSmith tokens deliberately.
+# Requires repo secrets: GEMINI_API_KEY, LANGSMITH_API_KEY.
+on:
+  workflow_dispatch:
+    inputs:
+      judges:
+        description: "Run LLM judge evaluators (costs extra tokens)"
+        type: boolean
+        default: true
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run eval -- ${{ inputs.judges && '' || '--no-judges' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+          LANGSMITH_TRACING: "true"
+          LANGSMITH_PROJECT: email-triage
