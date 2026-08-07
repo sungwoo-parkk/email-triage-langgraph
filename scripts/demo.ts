@@ -13,17 +13,26 @@ import { runMigrations } from "../src/lib/migrate";
 import { buildTriageGraph } from "../src/graph/triage";
 import type { ThreadSnapshot } from "../src/lib/normalize";
 import { setConfigKey, getConfig } from "../src/lib/config";
-import { executeDecision } from "../src/lib/act";
+import { executeDecision, makeContextBodyFor } from "../src/lib/act";
 import type { MailClient } from "../src/lib/mail/types";
 import { makeClassifier, type Classification } from "../src/lib/classify";
-import { loadOfficeConfig } from "../src/lib/officeConfig";
+import { loadOfficeConfig, setOfficeConfig, deriveVocabulary } from "../src/lib/officeConfig";
 
-// TEMPORARY (Task 6): pinned to the AGY example config; Task 11 makes this pick an
-// office at the command line. Classification.tasks now carry a single `category` id
-// (Task 7 rewrites decide() to route/forward off the office vocabulary); the canned
-// fixtures below keep the same primary Gmail label string as their category id purely
-// so this offline demo still exercises the same auto-act/needs_review paths as before.
+// TEMPORARY (Task 6/7): pinned to the AGY example config; Task 11 makes this pick an
+// office at the command line and rewrites the fixtures/output for the new config-driven
+// routing model properly. The canned fixtures below use AGY's real category ids (Task 7
+// moved classification off free Gmail label strings onto office-vocabulary ids) and an
+// explicit autoActLabels override below approximates the old curated strong-category
+// list under the new ids, purely so this offline demo still exercises the same
+// auto-act/needs_review narrative as before.
 const officeCfg = loadOfficeConfig("examples/agency/triage.config.json");
+
+// Approximates config.ts's (still Gmail-label-shaped) DEFAULTS strong-category curation
+// under the new office-vocabulary category ids, so the demo keeps distinguishing
+// auto-act from review-only the way its per-fixture notes describe.
+const STRONG_CATEGORY_IDS = [
+  "carrier-cancellation", "loss-run-request", "wc-certificate", "commercial-endorsement", "nho-endorsement",
+];
 
 interface Fixture { snap: ThreadSnapshot; canned: Classification | "rule-handles-this"; note: string }
 
@@ -35,55 +44,55 @@ const FIXTURES: Fixture[] = [
     canned: "rule-handles-this",
   },
   {
-    note: "carrier cancellation notice -> structural co-emit adds DOCS&NOTICE",
+    note: "carrier cancellation notice -> strong category, auto-decides",
     snap: { threadId: "demo-2", from: "Policy Services <policyservices@lighthouse-mutual.example>", subject: "Cancellation Endorsement - Policy CP8811223 - RIVERSIDE HARDWARE LLC",
       listId: null, attachments: ["cancellation-endorsement.pdf"], bodyText: "Please find the cancellation endorsement effective 09/15 for nonpayment of premium.", internalDateMs: 2, to: [], references: [] },
-    canned: { tasks: [{ category: "Cancelllation" }], confidence: "high", rationale: "Carrier-issued cancellation endorsement." },
+    canned: { tasks: [{ category: "carrier-cancellation" }], confidence: "high", rationale: "Carrier-issued cancellation endorsement." },
   },
   {
     note: "loss run request -> strong category, auto-decides",
     snap: { threadId: "demo-3", from: "Amy Torres <amy@harborpoint-ins.example>", subject: "Loss runs needed - GOLDEN WOK RESTAURANT INC",
       listId: null, attachments: [], bodyText: "Hi team, could you send 3 years of loss runs for the above insured? Renewal marketing.", internalDateMs: 3, to: [], references: [] },
-    canned: { tasks: [{ category: "7-Loss Run Req" }], confidence: "high", rationale: "Broker requests claims history." },
+    canned: { tasks: [{ category: "loss-run-request" }], confidence: "high", rationale: "Broker requests claims history." },
   },
   {
     note: "NY workers-comp certificate -> strong category, auto-decides",
     snap: { threadId: "demo-4", from: "CSR Desk <csr@midtowncoverage.example>", subject: "C105 for GREEN GARDEN DELI CORP WWC1122334",
       listId: null, attachments: ["cert-holder.png"], bodyText: "Please provide C-105.2 with the below certificate holder. Thank you.", internalDateMs: 4, to: [], references: [] },
-    canned: { tasks: [{ category: "8-C-105.2" }], confidence: "high", rationale: "NY WC certificate request (WWC prefix)." },
+    canned: { tasks: [{ category: "wc-certificate" }], confidence: "high", rationale: "NY WC certificate request (WWC prefix)." },
   },
   {
-    note: "carrier invoice -> Billing is review-only even at high confidence",
+    note: "carrier invoice -> review-only even at high confidence (not a strong category)",
     snap: { threadId: "demo-5", from: "AR <billing@lighthouse-mutual.example>", subject: "Commission statement and invoice - August",
       listId: null, attachments: ["invoice-0826.pdf"], bodyText: "Your monthly statement is attached. Amount due: $4,120.55 by 09/01.", internalDateMs: 5, to: [], references: [] },
-    canned: { tasks: [{ category: "Billing" }], confidence: "high", rationale: "Carrier invoice for the agency." },
+    canned: { tasks: [{ category: "carrier-invoice" }], confidence: "high", rationale: "Carrier invoice for the agency." },
   },
   {
     note: "two requests in one email -> two tasks; weaker one holds the whole decision",
     snap: { threadId: "demo-6", from: "Gina Park <gina@queensbridge-brokers.example>", subject: "MAPLE CLEANERS - address change + cancel BOP",
       listId: null, attachments: ["signed-LPR.pdf"], bodyText: "Two things: update the mailing address to 44-02 Main St, and cancel the BOP effective 9/30 - signed LPR attached.", internalDateMs: 6, to: [], references: [] },
     canned: { tasks: [
-      { category: "3-Endorsement" },
-      { category: "4-CAN REQ" },
+      { category: "commercial-endorsement" },
+      { category: "cancel-request" },
     ], confidence: "high", rationale: "Endorsement request plus broker cancellation request." },
   },
   {
     note: "NHO homeowners endorsement -> desk-convention forward",
     snap: { threadId: "demo-7", from: "Leo Chan <leo@brightpath-brokerage.example>", subject: "NHO - add mortgagee clause - 88 GARDEN AVE",
       listId: null, attachments: [], bodyText: "Please add the mortgagee clause below to the homeowners policy and send the updated dec page.", internalDateMs: 7, to: [], references: [] },
-    canned: { tasks: [{ category: "2-NY/Endorsement" }], confidence: "high", rationale: "NHO book endorsement; express desk convention." },
+    canned: { tasks: [{ category: "nho-endorsement" }], confidence: "high", rationale: "NHO book endorsement; express desk convention." },
   },
   {
-    note: "newsletter -> disregard is review-only (never auto-acted)",
+    note: "newsletter -> junk is review-only (never auto-acted)",
     snap: { threadId: "demo-8", from: "Insurance Weekly <news@insuranceweekly.example>", subject: "5 trends reshaping commercial lines",
       listId: "<news.insuranceweekly.example>", attachments: [], bodyText: "This week in insurance: markets, MGAs, and more. Unsubscribe anytime.", internalDateMs: 8, to: [], references: [] },
-    canned: { tasks: [{ category: "disregard" }], confidence: "high", rationale: "Marketing newsletter, no action." },
+    canned: { tasks: [{ category: "junk" }], confidence: "high", rationale: "Marketing newsletter, no action." },
   },
   {
     note: "genuinely ambiguous -> honest medium confidence routes to humans",
     snap: { threadId: "demo-9", from: "info@oldclient.example", subject: "question about my policy",
       listId: null, attachments: [], bodyText: "Hi, I had a question about what my policy covers, can someone call me back?", internalDateMs: 9, to: [], references: [] },
-    canned: { tasks: [{ category: "2-NY" }], confidence: "medium", rationale: "Unclear request; front-office judgment needed." },
+    canned: { tasks: [{ category: "front-office" }], confidence: "medium", rationale: "Unclear request; front-office judgment needed." },
   },
 ];
 
@@ -93,7 +102,7 @@ function fakeGmail(log: string[]): MailClient {
     listHistory: async function* () {},
     ensureCategories: async () => {},
     applyCategories: async (id, labels) => { log.push(`  gmail.applyCategories   ${id}  [${labels.join(", ")}]`); },
-    forward: async (id, to) => { log.push(`  gmail.forward       ${id}  -> ${to}`); },
+    forward: async (id, to, contextBody) => { log.push(`  gmail.forward       ${id}  -> ${to}  (${contextBody.slice(0, 40)}...)`); },
     sendMessage: async () => { log.push("  gmail.sendMessage"); },
   };
 }
@@ -122,9 +131,11 @@ async function main() {
   } satisfies Querier);
   const db = getDb();
   await runMigrations(db);
+  await setOfficeConfig(db, officeCfg);
+  await setConfigKey(db, "autoActLabels", STRONG_CATEGORY_IDS);
   await db.query(
     `insert into rules (pattern_type, pattern, label_set, complete, source)
-     values ('sender_domain', 'dxc.com', '["3-KR","3-KR/DOCS&NOTICE"]', true, 'phase0')`
+     values ('sender_domain', 'dxc.com', '["carrier-docs"]', true, 'phase0')`
   );
 
   const canned = new Map(FIXTURES.map((f) => [f.snap.threadId, f.canned]));
@@ -137,7 +148,7 @@ async function main() {
       };
 
   const gmailLog: string[] = [];
-  const graph = buildTriageGraph({ db, gmail: fakeGmail(gmailLog), classify: classify as any });
+  const graph = buildTriageGraph({ db, mail: fakeGmail(gmailLog), classify: classify as any });
 
   console.log(`\n=== EMAIL TRIAGE DEMO ${live ? "(live Gemini)" : "(offline, canned classifier)"} ===\n`);
   console.log("STAGE: shadow - the pipeline decides and records, Gmail is never touched.\n");
@@ -150,7 +161,7 @@ async function main() {
     ids.push(id);
     const { rows } = await db.query(`select final_tasks, confidence, status from decisions where id = $1`, [id]);
     const tasks = typeof rows[0].final_tasks === "string" ? JSON.parse(rows[0].final_tasks) : rows[0].final_tasks;
-    const labels = [...new Set(tasks.flatMap((t: any) => t.labels))].join(", ");
+    const labels = [...new Set(tasks.map((t: any) => t.label))].join(", ");
     const fwd = tasks.map((t: any) => t.forwardTo).filter(Boolean).join(", ") || "-";
     console.log(`  ${pad(f.snap.from.replace(/^.*</, "").replace(/>$/, ""), 34)} ${pad(f.snap.subject, 40)} ${pad(labels || "-", 38)} ${pad(fwd, 18)} ${pad(rows[0].confidence, 6)} ${rows[0].status}`);
     console.log(`  ${pad("", 34)} > ${f.note}`);
@@ -161,12 +172,15 @@ async function main() {
   console.log("STAGE: autonomous - same decisions, now the act layer executes what the stage permits.\n");
   await setConfigKey(db, "stage", "autonomous");
   const cfg = await getConfig(db);
-  for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg);
+  const vocab = deriveVocabulary(officeCfg);
+  const ctx = { vocab, contextBodyFor: makeContextBodyFor(db, vocab) };
+  for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg, ctx);
   gmailLog.forEach((l) => console.log(l));
-  console.log(`\n  Executed ${gmailLog.length} Gmail action(s). needs_review decisions executed nothing - they wait for a human.`);
+  console.log(`\n  Executed ${gmailLog.length} Gmail action(s). needs_review decisions still send a review-forward (a`);
+  console.log(`  planned action, gated like any other) but their status stays needs_review for a human.`);
 
   const before = gmailLog.length;
-  for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg);
+  for (const id of ids) await executeDecision(db, fakeGmail(gmailLog), id, cfg, ctx);
   console.log(`  Re-running all decisions executes ${gmailLog.length - before} action(s) - idempotency: a retry can never double-send.\n`);
 }
 

@@ -2,9 +2,11 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { setDb, getDb, type Querier } from "@/lib/db";
 import { runMigrations } from "@/lib/migrate";
-import { executeDecision } from "@/lib/act";
+import { executeDecision, makeContextBodyFor } from "@/lib/act";
 import { recordDecision, decide } from "@/lib/decide";
 import { normalize } from "@/lib/normalize";
+import { makeFakeMail } from "@/lib/mail/fake";
+import { loadOfficeConfig, deriveVocabulary, setOfficeConfig, configHash, type Vocabulary } from "@/lib/officeConfig";
 import type { MailClient } from "@/lib/mail/types";
 
 function pgliteAdapter(p: PGlite): Querier {
@@ -24,76 +26,103 @@ function pgliteAdapter(p: PGlite): Querier {
   };
 }
 
-function fakeGmail() {
-  const calls: string[] = [];
-  const g: MailClient = {
-    listNewThreads: async () => [],
-    listHistory: async function* () {},
-    ensureCategories: async () => {},
-    applyCategories: async (id, labels) => { calls.push(`labels:${id}:${labels.sort().join("|")}`); },
-    forward: async (id, to) => { calls.push(`forward:${id}:${to}`); },
-    sendMessage: async () => { calls.push("alert"); },
-  };
-  return { g, calls };
+const officeCfg = loadOfficeConfig("examples/hartley/triage.config.json");
+const vocab = deriveVocabulary(officeCfg);
+const REVIEW = officeCfg.review.recipient; // "jo@hartleysons.example"
+const HASH = configHash(officeCfg);
+
+// A "decided" decision (category allowed -> categories + routee forward) and a
+// "needs_review" decision (category outside the allow-list -> review-forward only),
+// both produced the same way the real graph would via decide()/recordDecision().
+async function seedDecided(threadId: string): Promise<number> {
+  const email = normalize({ threadId, from: "cust@x.example", to: [], subject: "quote request", listId: null, attachments: [], bodyText: "please send a quote for a new policy", internalDateMs: 1, references: [] });
+  const rule = { hits: [], labels: [], forwards: [], complete: false };
+  const llm = { tasks: [{ category: "sales" }], confidence: "high" as const, rationale: "wants pricing" };
+  const cfg = { stage: "shadow" as const, autoActLabels: ["sales"] };
+  const d = decide(vocab, REVIEW, rule, llm, cfg);
+  return recordDecision(getDb(), email, rule, llm, d, "shadow", HASH);
 }
 
-// NOTE: Classification.tasks no longer carries forward_to (Task 6 rewrite); a complete
-// rule hit gives an equivalent labels+forward decision without depending on the LLM shape.
-const highDecision = () =>
-  decide({ hits: [], labels: ["4-CAN REQ"], forwards: ["invoice@agency.example"], complete: true }, null,
-    { stage: "shadow", autoActLabels: [] });
-
-async function seed(threadId: string) {
-  const email = normalize({ threadId, from: "a@b.com", to: [], subject: "s", listId: null, attachments: [], bodyText: "", internalDateMs: 1, references: [] });
-  return recordDecision(getDb(), email, { hits: [], labels: [], forwards: [], complete: false }, null, highDecision(), "test");
+async function seedNeedsReview(threadId: string): Promise<number> {
+  const email = normalize({ threadId, from: "cust@x.example", to: [], subject: "order problem", listId: null, attachments: [], bodyText: "my order arrived broken", internalDateMs: 1, references: [] });
+  const rule = { hits: [], labels: [], forwards: [], complete: false };
+  const llm = { tasks: [{ category: "support" }], confidence: "high" as const, rationale: "broken order" };
+  const cfg = { stage: "shadow" as const, autoActLabels: ["sales"] }; // "support" not allowed -> review
+  const d = decide(vocab, REVIEW, rule, llm, cfg);
+  return recordDecision(getDb(), email, rule, llm, d, "shadow", HASH);
 }
 
 describe("executeDecision", () => {
+  let ctx: { vocab: Vocabulary; contextBodyFor(decisionId: number): Promise<string> };
+
   beforeEach(async () => {
     const p = new PGlite();
     setDb(pgliteAdapter(p));
     await runMigrations(getDb());
+    await setOfficeConfig(getDb(), officeCfg);
+    ctx = { vocab, contextBodyFor: makeContextBodyFor(getDb(), vocab) };
   });
 
-  it("shadow stage executes nothing", async () => {
-    const id = await seed("s1");
-    const { g, calls } = fakeGmail();
-    await executeDecision(getDb(), g, id, { stage: "shadow", autoActLabels: [] });
-    expect(calls).toEqual([]);
+  it("shadow executes nothing", async () => {
+    const id = await seedDecided("s1");
+    const mail = makeFakeMail();
+    await executeDecision(getDb(), mail, id, { stage: "shadow", autoActLabels: [] }, ctx);
+    expect(mail.log).toEqual([]);
     const { rows } = await getDb().query(`select status from decisions where id=$1`, [id]);
     expect(rows[0].status).toBe("decided");
   });
 
-  it("assisted stage applies labels but never forwards", async () => {
-    const id = await seed("s2");
-    const { g, calls } = fakeGmail();
-    await executeDecision(getDb(), g, id, { stage: "assisted", autoActLabels: [] });
-    expect(calls).toEqual(["labels:s2:4-CAN REQ"]);
+  it("assisted applies categories and review-forwards, never routee forwards", async () => {
+    const decidedId = await seedDecided("s2");
+    const reviewId = await seedNeedsReview("s3");
+    const mail = makeFakeMail();
+    const cfg = { stage: "assisted" as const, autoActLabels: [] };
+
+    await executeDecision(getDb(), mail, decidedId, cfg, ctx);
+    expect(mail.log.some((l) => l.startsWith("categories:s2:triage/sales"))).toBe(true);
+    expect(mail.log.some((l) => l.startsWith("forward:s2:"))).toBe(false); // routee forward blocked in assisted
+
+    await executeDecision(getDb(), mail, reviewId, cfg, ctx);
+    const reviewForward = mail.log.find((l) => l.startsWith(`forward:s3:${REVIEW}:`));
+    expect(reviewForward).toBeTruthy();
+
+    const { rows } = await getDb().query(`select status from decisions where id=$1`, [reviewId]);
+    expect(rows[0].status).toBe("needs_review"); // review-forward ran, but a human still has to look
   });
 
-  it("autonomous stage applies labels and forwards, and is idempotent", async () => {
-    const id = await seed("s3");
-    const { g, calls } = fakeGmail();
-    const cfg = { stage: "autonomous" as const, autoActLabels: [] };
-    await executeDecision(getDb(), g, id, cfg);
-    await executeDecision(getDb(), g, id, cfg); // second run must be a no-op
-    expect(calls).toEqual(["labels:s3:4-CAN REQ", "forward:s3:invoice@agency.example"]);
-    const { rows } = await getDb().query(`select status, actions_executed from decisions where id=$1`, [id]);
+  it("autonomous executes routee forwards with the context body", async () => {
+    const id = await seedDecided("s4");
+    const mail = makeFakeMail();
+    await executeDecision(getDb(), mail, id, { stage: "autonomous", autoActLabels: [] }, ctx);
+    const fwd = mail.log.find((l) => l.startsWith("forward:s4:sales@hartleysons.example:"));
+    expect(fwd).toBeTruthy();
+    expect(fwd).toContain("[triage]"); // Task 3 carry-forward: no empty-string forward bodies
+    const { rows } = await getDb().query(`select status from decisions where id=$1`, [id]);
     expect(rows[0].status).toBe("acted");
   });
 
-  it("a failing forward marks the decision failed but keeps executed labels recorded", async () => {
-    const id = await seed("s4");
-    const g: MailClient = {
+  it("remains idempotent per action across re-runs", async () => {
+    const id = await seedDecided("s5");
+    const mail = makeFakeMail();
+    const cfg = { stage: "autonomous" as const, autoActLabels: [] };
+    await executeDecision(getDb(), mail, id, cfg, ctx);
+    const first = [...mail.log];
+    await executeDecision(getDb(), mail, id, cfg, ctx); // second run must be a no-op
+    expect(mail.log).toEqual(first);
+  });
+
+  it("a failing forward marks the decision failed but keeps executed categories recorded", async () => {
+    const id = await seedDecided("s6");
+    const failingMail: MailClient = {
       listNewThreads: async () => [], listHistory: async function* () {}, ensureCategories: async () => {},
       applyCategories: async () => {},
       forward: async () => { throw new Error("smtp down"); }, sendMessage: async () => {},
     };
-    await executeDecision(getDb(), g, id, { stage: "autonomous", autoActLabels: [] });
+    await executeDecision(getDb(), failingMail, id, { stage: "autonomous", autoActLabels: [] }, ctx);
     const { rows } = await getDb().query(`select status, actions_executed, error_detail from decisions where id=$1`, [id]);
     expect(rows[0].status).toBe("failed");
     expect(rows[0].error_detail).toBe("smtp down");
     const executed = typeof rows[0].actions_executed === "string" ? JSON.parse(rows[0].actions_executed) : rows[0].actions_executed;
-    expect(executed.some((a: any) => a.kind === "labels")).toBe(true);
+    expect(executed.some((a: any) => a.kind === "categories")).toBe(true);
   });
 });

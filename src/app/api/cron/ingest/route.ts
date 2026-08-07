@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   const officeCfg = await getOfficeConfig(db);
   if (!officeCfg) return NextResponse.json({ error: "office not configured" }, { status: 500 });
   const gmail = makeGmail();
-  const graph = buildTriageGraph({ db, gmail, classify: makeClassifier(officeCfg, []) });
+  const graph = buildTriageGraph({ db, mail: gmail, classify: makeClassifier(officeCfg, []) });
 
   const { rows } = await db.query(`select checkpoint_ms from ingest_state where id = 1`);
   const checkpoint = Number(rows[0].checkpoint_ms);
