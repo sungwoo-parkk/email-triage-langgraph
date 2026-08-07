@@ -55,7 +55,7 @@ runtime (per office deployment)
    - **Silver:** office's LLM classifies a sample of the remainder against the config taxonomy, stratified by sender domain and spread across the time window (so one chatty newsletter can't dominate the sample).
    - **Purity mining:** phase0 algorithm generalized — `sender_exact` / `sender_domain` / `list_id` / `subject_template` patterns meeting purity/support thresholds (defaults from the case study: domain ≥0.9/10, exact ≥0.95/5) become rules, `source: mined-gold` or `mined-llm`; gold-backed rules start with higher trust.
 4. **Generate** — taxonomy prompt assembled from config descriptions + few-shot exemplars drawn from the office's own high-confidence mined history; zod output schema built from config (categories enum + routee-address forward enum).
-5. **Evaluate** — a held-out slice of mined ground truth (gold preferred; default 20% of labeled threads, min 30, capped 200) is excluded from rule mining and becomes the office's personal blind test. CLI reports per-category agreement in plain language and seeds `autoActLabels` from categories that measure strong. Below a floor (~70% overall) the deploy proceeds with **everything review-only** and a plain warning.
+5. **Evaluate** — a held-out slice of mined ground truth (gold preferred; default 20% of labeled threads, min 30, capped 200) is excluded from rule mining and becomes the office's personal blind test. Results are written as a **self-contained local HTML report** (`triage-report.html`, opened automatically): overall agreement, per-category table with the strong / review-only split, mined rules with their evidence tiers, and a sample of "what would have been auto-routed last month." The report is the trust moment — legible to a non-technical owner, emailable to a skeptical boss, and the README's screenshot. The terminal prints the same summary. `autoActLabels` seeds from categories that measure strong. Below a floor (~70% overall) the deploy proceeds with **everything review-only** and a plain warning (stated in the report, not just the terminal). No hosted UI exists in v1 — the report is a generated artifact with zero ongoing surface: no server, no auth, no state.
 6. **Deploy** — productized version of the case study's deployment automation: Vercel link, Neon provision via Marketplace, env push, migrations + mined-rule seeding, deploy, smoke ingest. Lands in **shadow**.
 
 ## 5. Config schema (`triage.config.json`, zod-validated, versioned)
@@ -144,7 +144,7 @@ Fail toward humans, never fail-open — inherited posture, extended to onboardin
 
 | Milestone | Contents | Definition of done |
 |---|---|---|
-| **M1** | Config-core refactor, onboarding CLI end-to-end (Gmail), mining + generation + per-office eval, email-native review + correction observer, digest | A stranger's office can go from clone to shadow mode in one sitting using only the README |
+| **M1** | Config-core refactor, onboarding CLI end-to-end (Gmail), mining + generation + per-office eval **with the HTML onboarding report**, email-native review + correction observer, digest | A stranger's office can go from clone to shadow mode in one sitting using only the README |
 | **M2** | Microsoft Graph provider against frozen contract tests; Entra device-code onboarding path | Same sitting, M365 mailbox |
 | **M3** | Polish from first external users: correction-loop tuning, docs hardening, revisit the UI question with evidence | Driven by real usage reports |
 
@@ -161,4 +161,5 @@ Fail toward humans, never fail-open — inherited posture, extended to onboardin
 - Non-forwarding offices (reply-only routing) — observe reply-to-sender patterns as a future gold source.
 - Shared-inbox tools overlap (Front, Missive) — positioning note for the README, not a feature decision.
 - Config-change migrations (routee departs; category rename) — v1 rule: explicit `npx triage reconfigure` re-runs generation + eval; history keeps old vocabulary.
-- IMAP/other providers; hosted offering; UI — all post-M3, evidence-driven.
+- IMAP/other providers; hosted offering — post-M3, evidence-driven.
+- **Interactive UI (review queue/dashboard): deferred with explicit triggers.** Build it only if M3 feedback shows any of: digest emails being ignored; corrections not happening because forwarding feels heavy; users explicitly asking where to see pending items; or multi-reviewer offices emerging (email review assumes ~one triage person). Until a trigger fires, visual needs are served by generated artifacts (`triage-report.html`; later `npx triage status --report`). Rationale: an operational UI would add auth/hosting surface to self-hosted deployments and would starve the passive correction loop, which learns from reviewers forwarding mail as they always have.
