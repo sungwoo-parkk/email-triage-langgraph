@@ -2,9 +2,15 @@ import { describe, it, expect } from "vitest";
 import { buildQuery, buildForwardRaw } from "@/lib/mail/gmail";
 
 describe("buildQuery", () => {
-  it("converts ms checkpoint to epoch-seconds after: with 1s overlap", () => {
+  it("converts ms checkpoint to epoch-seconds after: with 1s overlap, scoped to the inbox", () => {
     // 1_754_400_123_456 ms -> 1_754_400_123 s; overlap-1 => after:1754400122
-    expect(buildQuery(1_754_400_123_456)).toBe("after:1754400122 -in:spam -in:trash");
+    // Finding I2: scoped to in:inbox so the ingest cron never re-triages the system's own
+    // sent mail (digest, watchdog alerts, review-forwards) as if it were new inbound mail.
+    expect(buildQuery(1_754_400_123_456)).toBe("after:1754400122 in:inbox -in:spam -in:trash");
+  });
+
+  it("scopes to in:sent instead when opts.sent is set, without an inbox/sent contradiction", () => {
+    expect(buildQuery(1_754_400_123_456, { sent: true })).toBe("in:sent after:1754400122 -in:spam -in:trash");
   });
 });
 

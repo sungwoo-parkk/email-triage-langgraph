@@ -2,8 +2,19 @@ import { google, type gmail_v1 } from "googleapis";
 import { randomBytes } from "node:crypto";
 import type { MailClient, ThreadSnapshot } from "./types";
 
-export function buildQuery(sinceMs: number): string {
-  return `after:${Math.floor(sinceMs / 1000) - 1} -in:spam -in:trash`;
+/**
+ * Finding I2: the non-sent query used to omit `in:inbox`, so it searched all of Gmail (not
+ * just the inbox) - which includes threads the system itself just sent (the daily digest,
+ * watchdog alerts, review-forwards). Those got triaged as if they were new inbound mail:
+ * wasted LLM spend, and at assisted+ stage the system could even review-forward its own
+ * digest. `opts.sent` keeps the query coherent for the sent-mail observer, which
+ * deliberately wants the opposite scope.
+ */
+export function buildQuery(sinceMs: number, opts?: { sent?: boolean }): string {
+  const since = Math.floor(sinceMs / 1000) - 1;
+  return opts?.sent
+    ? `in:sent after:${since} -in:spam -in:trash`
+    : `after:${since} in:inbox -in:spam -in:trash`;
 }
 
 export function buildForwardRaw(opts: {
@@ -98,7 +109,7 @@ export function makeGmail(api?: gmail_v1.Gmail): MailClient {
     async listNewThreads(sinceMs, opts) {
       const out: ThreadSnapshot[] = [];
       let pageToken: string | undefined;
-      const q = opts?.sent ? `in:sent ${buildQuery(sinceMs)}` : buildQuery(sinceMs);
+      const q = buildQuery(sinceMs, opts);
       do {
         const { data } = await gmail.users.threads.list({
           userId: "me", q, maxResults: 100, pageToken,
