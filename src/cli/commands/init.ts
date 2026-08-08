@@ -33,11 +33,17 @@ export async function run(args: CliArgs): Promise<void> {
   console.log(`\nWrote artifacts to ${ARTIFACTS_DIR}`);
 
   console.log(`\n=== Deploying ===`);
-  await runDeploy({ db: getDb(), cfg, artifactsDir: ARTIFACTS_DIR, secrets: gatherSecrets(cfg) });
+  // Pass getDb itself (not getDb()) - finding C4: DATABASE_URL doesn't exist yet at this
+  // point in the process (Neon is provisioned inside runDeploy), so resolving a Querier
+  // here would pin a pool to a dead connection string before it's even set. runDeploy calls
+  // this only after DATABASE_URL is pulled down, right after its own resetDb().
+  await runDeploy({ getDb, cfg, artifactsDir: ARTIFACTS_DIR, secrets: gatherSecrets(cfg) });
 }
 
 function gatherSecrets(cfg: OfficeConfig): Record<string, string> {
   const keys = [
+    // GOOGLE_OAUTH_REFRESH_TOKEN: only present in process.env here because connectStep (run
+    // above) sets it immediately via appendEnvVar, not just the .env file - see finding C3.
     "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET", "GOOGLE_OAUTH_REFRESH_TOKEN",
     "GMAIL_USER", cfg.llm.apiKeyEnv, "CRON_SECRET",
   ];

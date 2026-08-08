@@ -9,11 +9,13 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { confirm } from "../confirm";
 import type { Querier } from "../../lib/db";
+import { resetDb } from "../../lib/db";
 import type { OfficeConfig } from "../../lib/officeConfig";
 import { setOfficeConfig } from "../../lib/officeConfig";
 import { runMigrations } from "../../lib/migrate";
 import { seedMinedRules } from "../../lib/mining";
-import { readArtifacts } from "./mine";
+import { setConfigKey } from "../../lib/config";
+import { readArtifacts, type Artifacts } from "./mine";
 
 async function step(description: string, cmd: string, args: string[]): Promise<void> {
   console.log(`\n> ${description}`);
@@ -50,6 +52,26 @@ async function seedExemplars(db: Querier, exemplars: { categoryId: string; fromA
   }
 }
 
+/**
+ * The DB-writing half of deploy, pulled out of runDeploy so it's testable without mocking
+ * the Vercel CLI / interactive confirm() prompts that surround it.
+ */
+export async function seedDatabase(db: Querier, cfg: OfficeConfig, artifacts: Artifacts): Promise<{ insertedRules: number }> {
+  await runMigrations(db);
+  await setOfficeConfig(db, cfg);
+  const insertedRules = await seedMinedRules(db, artifacts.minedRules);
+  await seedExemplars(db, artifacts.exemplars);
+  // Finding C1: strongCategoryIds was display-only - the onboarding report told the office
+  // these categories would auto-route, but nothing ever wrote the runtime allow-list
+  // (config.autoActLabels) that decide() actually checks, so every LLM decision stayed
+  // needs_review forever even after promotion. Seed it here from the same eval the report
+  // renders. Live correction-driven updates to this allow-list (as opposed to the *rules*
+  // table, which promoteLearnedRules in observer.ts already grows from corrections) are a
+  // follow-up - spec §2's second half.
+  await setConfigKey(db, "autoActLabels", artifacts.evalReport?.strongCategoryIds ?? []);
+  return { insertedRules };
+}
+
 async function deployToProduction(): Promise<string> {
   console.log(`\n> Deploy to production`);
   console.log(`  $ vercel deploy --prod`);
@@ -72,7 +94,14 @@ async function smokeIngest(deployUrl: string, cronSecret: string): Promise<void>
 }
 
 export interface DeployOptions {
-  db: Querier;
+  /**
+   * Lazily resolves the DB handle - call it only after DATABASE_URL exists (see resetDb()
+   * below). Finding C4: init.ts used to pass an already-resolved `getDb()` Querier here,
+   * captured before Neon was provisioned; that pins a pool to a dead/missing connection
+   * string that migrations then fail against, even after the real DATABASE_URL is pulled
+   * down later in this same function.
+   */
+  getDb: () => Querier;
   cfg: OfficeConfig;
   artifactsDir: string;
   /** env vars to push to Vercel — e.g. GOOGLE_OAUTH_*, GMAIL_USER, the LLM apiKeyEnv, CRON_SECRET. */
@@ -80,7 +109,7 @@ export interface DeployOptions {
 }
 
 export async function runDeploy(opts: DeployOptions): Promise<void> {
-  const { db, cfg, artifactsDir, secrets } = opts;
+  const { cfg, artifactsDir, secrets } = opts;
 
   await step("Link this project to Vercel", "vercel", ["link", "--yes"]);
   await step("Provision Neon Postgres via the Vercel Marketplace", "vercel", ["integration", "add", "neon"]);
@@ -92,12 +121,15 @@ export async function runDeploy(opts: DeployOptions): Promise<void> {
   execFileSync("vercel", ["env", "pull", ".env"], { stdio: "inherit" });
   loadEnvFile(path.join(process.cwd(), ".env"));
 
+  // DATABASE_URL now exists in process.env for the first time this process has seen it
+  // (Neon was just provisioned above, a few lines up). Drop any pool getDb() may have built
+  // earlier — pre-provisioning — before resolving the real one (finding C4).
+  resetDb();
+  const db = opts.getDb();
+
   console.log(`\n> Run database migrations and seed from the mined artifacts`);
-  await runMigrations(db);
-  await setOfficeConfig(db, cfg);
   const artifacts = readArtifacts(artifactsDir);
-  const insertedRules = await seedMinedRules(db, artifacts.minedRules);
-  await seedExemplars(db, artifacts.exemplars);
+  const { insertedRules } = await seedDatabase(db, cfg, artifacts);
   console.log(`  seeded office config, ${insertedRules} rule(s), ${artifacts.exemplars.length} exemplar(s).`);
 
   const deployUrl = await deployToProduction();
