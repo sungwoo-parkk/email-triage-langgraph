@@ -63,7 +63,17 @@ export async function authorizeGmail(mailbox: string, log: (msg: string) => void
   return refreshToken;
 }
 
-/** Appends/updates a KEY=VALUE line in .env, creating the file if it doesn't exist yet. */
+/**
+ * Appends/updates a KEY=VALUE line in .env, creating the file if it doesn't exist yet, AND
+ * sets it on process.env immediately.
+ *
+ * Finding C3: this used to only touch the file. .env is loaded by `--env-file-if-exists`
+ * when the CLI process *starts*, so a var written to the file mid-run (like the OAuth
+ * refresh token connectStep just obtained) was invisible to process.env for the rest of
+ * that same run — the first live `triage init` would authorize Gmail successfully, then
+ * crash the moment makeGmail() read process.env.GOOGLE_OAUTH_REFRESH_TOKEN a few steps
+ * later, right after the OAuth dance the user just completed.
+ */
 export function appendEnvVar(key: string, value: string, envPath = path.join(process.cwd(), ".env")): void {
   const line = `${key}=${value}`;
   if (!existsSync(envPath)) {
@@ -76,6 +86,7 @@ export function appendEnvVar(key: string, value: string, envPath = path.join(pro
       appendFileSync(envPath, (content.length && !content.endsWith("\n") ? "\n" : "") + line + "\n");
     }
   }
+  process.env[key] = value;
   console.log(`Added ${key} to ${envPath} (confirm it looks right before committing anything near it — .env is gitignored, but double-check).`);
 }
 
