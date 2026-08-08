@@ -25,46 +25,30 @@ function snap(o: Partial<ThreadSnapshot> & { threadId: string; from: string; sub
 const VENDOR_FROM = "OfficeSupply Co Billing <statements@officesupply.example>";
 const HARTLEY_FROM = "Hartley & Sons <info@hartleysons.example>";
 const JO = "jo@hartleysons.example";
-// After examples/hartley/history.json's last date (1785961600000) - keeps this file's
-// own fixture data cleanly out of the "since" windows the observer computes below.
-const FILL_BASE = 1786000000000;
 
 /**
- * examples/hartley/history.json alone (40 threads: 12 gold + 28 remainder) never clears
- * splitHoldout's spec-mandated min=30 holdout floor (20% of 40 is 8) - see task-12-report.md,
- * "Production fixes", finding 1. Without a holdout, evalReport stays null forever, and
- * without extra gold vendor volume, a holdout large enough to clear that floor would (by
- * splitHoldout's gold-first fill) drain every officesupply.example thread out of training.
- * This pushes both: more gold vendor same-thread forwards (so some survive training after
- * holdout extraction) and plain silver filler (so the labeled pool clears the 30-thread floor).
+ * examples/hartley/history.json (LEDGER MUST-FIX, final fix wave, 2026-08-07) now carries
+ * ~170 inbox threads / ~44 sent forwards on its own - grown deterministically from the
+ * original 40/12 (see the fixture's own appended entries: more newsletters, more mixed
+ * sales/support one-offs, more forwarded quote/support/billing threads across new fictional
+ * senders, all ascending dates, no Date.now()/Math.random()). That alone clears
+ * splitHoldout's spec-mandated min=30 holdout floor (20% of ~170 is ~34) without any
+ * synthetic filler - a prior version of this test pushed ~130 "aaa-fill-..." synthetic
+ * threads to clear that floor; those are gone now that the real fixture is big enough.
  *
- * Thread IDs are prefixed "aaa-fill-..." (sorting before every "hartley-..." real fixture
- * id) so splitHoldout's gold-first, then-threadId-alphabetical fill drains synthetic filler
- * into the holdout ahead of the real history.json vendor threads, leaving the real threads
- * in train to drive the mined rule test 1 asserts on - see REAL_VENDOR_IDS below.
+ * The 8 real "hartley-vendor-*" gold threads (forwarded to jo@ - see Task 11) still survive
+ * splitHoldout's gold-first, then-threadId-alphabetical holdout fill: the new gold forwards
+ * (the "hartley-billing", "hartley-quote", and "hartley-support" prefixes) all sort
+ * alphabetically before "hartley-vendor", so they fill the holdout first. Test 1 below
+ * still asserts at least 5 of the 8 vendor threads land in `train` (not swept into
+ * holdout) - anchoring the mined-gold rule it checks to real fixture content - see
+ * REAL_VENDOR_IDS.
  */
-function pushMiningFiller(mail: ReturnType<typeof makeFakeMail>): void {
-  const KINDS = ["Quote for chairs", "Invoice question", "Return request"];
-  for (let i = 0; i < 40; i++) {
-    const threadId = `aaa-fill-vendor-${String(i).padStart(3, "0")}`;
-    const dateMs = FILL_BASE + i * 100_000;
-    mail.pushInbox(snap({ threadId, from: VENDOR_FROM, subject: `Monthly statement #${2000 + i}`, bodyText: "Amount due.", internalDateMs: dateMs }));
-    mail.pushSent(snap({ threadId, from: HARTLEY_FROM, to: [JO], subject: `Fwd: Monthly statement #${2000 + i}`, internalDateMs: dateMs + 50_000 }));
-  }
-  for (let i = 0; i < 90; i++)
-    mail.pushInbox(snap({
-      threadId: `aaa-fill-${String(i).padStart(3, "0")}`, from: `p${i}@filler${i}.example`, subject: `${KINDS[i % 3]} #${i}`,
-      bodyText: "filler body for holdout volume", internalDateMs: FILL_BASE + 10_000_000 + i * 1000,
-    }));
-}
-
-// history.json's real forwarded vendor threads (8/8 forwarded to jo@ - see Task 11). Test 1
-// asserts at least 5 of these survived splitHoldout into `train` (not swept into holdout),
-// so the mined-gold rule it checks is anchored to real fixture content, not just filler.
 const REAL_VENDOR_IDS = Array.from({ length: 8 }, (_, i) => `hartley-vendor-0${i + 1}`);
 
-// Fresh thread from the office's own known vendor domain - the mined-gold rule from
-// pushMiningFiller/history.json should catch this without ever calling the classifier.
+// Fresh thread from the office's own known vendor domain, dated after every entry in
+// history.json - the mined-gold rule from history.json's real vendor forwards should catch
+// this without ever calling the classifier.
 const freshVendorEmail: ThreadSnapshot = snap({
   threadId: "hartley-vendor-fresh-01", from: VENDOR_FROM, subject: "Monthly statement #9999",
   bodyText: "Amount due: $88.00.", internalDateMs: 1786500000000,
@@ -117,7 +101,6 @@ describe("clone-to-shadow, end to end on fakes", () => {
     cfg = loadOfficeConfig("examples/hartley/triage.config.json");
     const history = JSON.parse(readFileSync("examples/hartley/history.json", "utf8")) as { inbox: ThreadSnapshot[]; sent: ThreadSnapshot[] };
     mail = makeFakeMail(history);
-    pushMiningFiller(mail);
     // Deterministic keyword stub, reused from init.ts's --dry-run path (exported for this
     // purpose - see task-12-report.md) rather than duplicated here: invoice/statement -> jo,
     // quote/order -> sales, return/damaged/etc -> support, list-id newsletters -> junk,

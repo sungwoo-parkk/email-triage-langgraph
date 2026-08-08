@@ -12,7 +12,7 @@ Self-hosted email triage for a small office's shared inbox (`info@`, `office@`, 
 git clone <repo> && cd <repo>
 npm install
 npm run triage -- init --dry-run   # the real onboarding pipeline, against a synthetic office
-npm test                            # 107 tests, in-memory Postgres, zero credentials
+npm test                            # 125 tests, in-memory Postgres, zero credentials
 npm run demo                        # the triage pipeline itself, end to end, offline
 ```
 

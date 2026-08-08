@@ -535,6 +535,1592 @@
       "bodyText": "This week in office furniture retail: Sustainable materials in commercial furniture. Read more on our site. Unsubscribe anytime from the link below.",
       "internalDateMs": 1785961600000,
       "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-07",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: 5 desk layouts that boost small-team focus",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: 5 desk layouts that boost small-team focus. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786000000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-08",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: What buyers ask before a bulk chair order",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: What buyers ask before a bulk chair order. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786002000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-09",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Warehouse to showroom: our new fulfillment partner",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Warehouse to showroom: our new fulfillment partner. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786004000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-10",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Autumn catalog preview",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Autumn catalog preview. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786006000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-11",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Return policy update for resellers",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Return policy update for resellers. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786008000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-12",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Case study: outfitting a 40-desk coworking floor",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Case study: outfitting a 40-desk coworking floor. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786010000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-13",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Fabric vs. mesh: a seating durability comparison",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Fabric vs. mesh: a seating durability comparison. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786012000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-14",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Held over from last quarter: backorder status",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Held over from last quarter: backorder status. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786014000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-15",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Meet our new upholstery supplier",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Meet our new upholstery supplier. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786016000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-16",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Office acoustics 101",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Office acoustics 101. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786018000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-17",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Standing desk motors: what actually fails first",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Standing desk motors: what actually fails first. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786020000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-18",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: A buyer's guide to reception furniture",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: A buyer's guide to reception furniture. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786022000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-19",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: How we price freight for large orders",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: How we price freight for large orders. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786024000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-20",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Chair recall watch: industry roundup",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Chair recall watch: industry roundup. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786026000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-21",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Small office, big storage: cabinet picks",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Small office, big storage: cabinet picks. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786028000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-22",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Why lead times shifted this season",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Why lead times shifted this season. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786030000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-23",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Reader mailbag: your desk questions answered",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Reader mailbag: your desk questions answered. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786032000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-24",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: New: modular conference tables",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: New: modular conference tables. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786034000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-25",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Sustainability update: recycled steel frames",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Sustainability update: recycled steel frames. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786036000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-newsletter-26",
+      "from": "Trade Weekly <news@tradeweekly.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Trade Weekly: Year in review: what small offices bought most",
+      "listId": "<news.tradeweekly.example>",
+      "attachments": [],
+      "bodyText": "This week in office furniture retail: Year in review: what small offices bought most. Read more on our site. Unsubscribe anytime from the link below.",
+      "internalDateMs": 1786038000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-023",
+      "from": "Owen Bergstrom <owen@wellspringrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 3 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 3 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786040000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-024",
+      "from": "Nadia Bergstrom <nadia@northlinerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5004) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786042000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-025",
+      "from": "Felix Bergstrom <felix@beaconrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786044000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-026",
+      "from": "Renee Bergstrom <renee@redwoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786046000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-027",
+      "from": "Marcus Bergstrom <marcus@anchorrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 7 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 7 desks and matching chairs.",
+      "internalDateMs": 1786048000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-028",
+      "from": "Ivy Bergstrom <ivy@groverealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1008",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1008 - it's been over a week since we placed it.",
+      "internalDateMs": 1786050000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-029",
+      "from": "Declan Bergstrom <declan@meridianrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 9 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 9 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786052000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-030",
+      "from": "Sasha Bergstrom <sasha@foxgloverealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 10 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786054000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-031",
+      "from": "Theo Bergstrom <theo@larkspurrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 11 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786056000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-032",
+      "from": "Paloma Bergstrom <paloma@hollowrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786058000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-033",
+      "from": "Jamal Bergstrom <jamal@pinecrestrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 13 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 13 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786060000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-034",
+      "from": "Odette Bergstrom <odette@sablerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5014) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786062000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-035",
+      "from": "Bruno Bergstrom <bruno@copperrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786064000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-036",
+      "from": "Celine Bergstrom <celine@thistlerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786066000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-037",
+      "from": "Hugo Bergstrom <hugo@ridgelinerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 5 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 5 desks and matching chairs.",
+      "internalDateMs": 1786068000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-038",
+      "from": "Farah Bergstrom <farah@vantagerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1006",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1006 - it's been over a week since we placed it.",
+      "internalDateMs": 1786070000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-039",
+      "from": "Leo Bergstrom <leo@amberrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 7 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 7 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786072000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-040",
+      "from": "Miriam Bergstrom <miriam@basaltrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 8 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786074000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-041",
+      "from": "Cyrus Bergstrom <cyrus@cobaltrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 9 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786076000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-042",
+      "from": "Anaya Bergstrom <anaya@driftwoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786078000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-043",
+      "from": "Owen Delacroix <owen@elmcourtrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 11 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 11 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786080000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-044",
+      "from": "Nadia Delacroix <nadia@fernbrookrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5012) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786082000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-045",
+      "from": "Felix Delacroix <felix@graniterealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786084000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-046",
+      "from": "Renee Delacroix <renee@ironwoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786086000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-047",
+      "from": "Marcus Delacroix <marcus@juniperrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 3 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 3 desks and matching chairs.",
+      "internalDateMs": 1786088000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-048",
+      "from": "Ivy Delacroix <ivy@kestrelrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1004",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1004 - it's been over a week since we placed it.",
+      "internalDateMs": 1786090000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-049",
+      "from": "Declan Delacroix <declan@latticerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 5 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 5 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786092000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-050",
+      "from": "Sasha Delacroix <sasha@maplewoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 6 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786094000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-051",
+      "from": "Theo Delacroix <theo@nimbusrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 7 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786096000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-052",
+      "from": "Paloma Delacroix <paloma@overlookrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786098000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-053",
+      "from": "Jamal Delacroix <jamal@palisaderealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 9 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 9 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786100000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-054",
+      "from": "Odette Delacroix <odette@quarryrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5010) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786102000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-055",
+      "from": "Bruno Delacroix <bruno@summitclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786104000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-056",
+      "from": "Celine Delacroix <celine@harborclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786106000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-057",
+      "from": "Hugo Delacroix <hugo@cedarclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 13 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 13 desks and matching chairs.",
+      "internalDateMs": 1786108000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-058",
+      "from": "Farah Delacroix <farah@unionclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1014",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1014 - it's been over a week since we placed it.",
+      "internalDateMs": 1786110000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-059",
+      "from": "Leo Delacroix <leo@wellspringclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 3 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 3 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786112000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-060",
+      "from": "Miriam Delacroix <miriam@northlineclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 4 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786114000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-061",
+      "from": "Cyrus Delacroix <cyrus@beaconclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 5 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786116000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-062",
+      "from": "Anaya Delacroix <anaya@redwoodclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786118000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-063",
+      "from": "Owen Nakamura <owen@anchorclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 7 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 7 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786120000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-064",
+      "from": "Nadia Nakamura <nadia@groveclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5008) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786122000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-065",
+      "from": "Felix Nakamura <felix@meridianclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786124000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-066",
+      "from": "Renee Nakamura <renee@foxgloveclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786126000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-067",
+      "from": "Marcus Nakamura <marcus@larkspurclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 11 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 11 desks and matching chairs.",
+      "internalDateMs": 1786128000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-068",
+      "from": "Ivy Nakamura <ivy@hollowclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1012",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1012 - it's been over a week since we placed it.",
+      "internalDateMs": 1786130000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-069",
+      "from": "Declan Nakamura <declan@pinecrestclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 13 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 13 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786132000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-070",
+      "from": "Sasha Nakamura <sasha@sableclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 14 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786134000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-071",
+      "from": "Theo Nakamura <theo@copperclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 3 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786136000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-072",
+      "from": "Paloma Nakamura <paloma@thistleclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786138000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-073",
+      "from": "Jamal Nakamura <jamal@ridgelineclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 5 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 5 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786140000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-074",
+      "from": "Odette Nakamura <odette@vantageclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5006) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786142000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-075",
+      "from": "Bruno Nakamura <bruno@amberclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786144000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-076",
+      "from": "Celine Nakamura <celine@basaltclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786146000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-077",
+      "from": "Hugo Nakamura <hugo@cobaltclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 9 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 9 desks and matching chairs.",
+      "internalDateMs": 1786148000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-078",
+      "from": "Farah Nakamura <farah@driftwoodclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1010",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1010 - it's been over a week since we placed it.",
+      "internalDateMs": 1786150000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-079",
+      "from": "Leo Nakamura <leo@elmcourtclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 11 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 11 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786152000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-080",
+      "from": "Miriam Nakamura <miriam@fernbrookclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 12 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786154000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-081",
+      "from": "Cyrus Nakamura <cyrus@graniteclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 13 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786156000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-082",
+      "from": "Anaya Nakamura <anaya@ironwoodclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786158000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-083",
+      "from": "Owen Osei <owen@juniperclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote request: 3 ergonomic chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Could you send a quote for 3 ergonomic task chairs? We're refreshing our office this quarter.",
+      "internalDateMs": 1786160000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-084",
+      "from": "Nadia Osei <nadia@kestrelclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged item on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the items from our recent order (order #5004) arrived damaged. Can we get a replacement?",
+      "internalDateMs": 1786162000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-085",
+      "from": "Felix Osei <felix@latticeclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "New office buildout - need a quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're moving into a new space and need a quote for desks, chairs, and a small conference table.",
+      "internalDateMs": 1786164000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-086",
+      "from": "Renee Osei <renee@maplewoodclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Wrong item shipped",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered black task chairs but received grey ones instead. Please advise on next steps.",
+      "internalDateMs": 1786166000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-087",
+      "from": "Marcus Osei <marcus@nimbusclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk order pricing - 7 units",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We're opening a second location and need bulk pricing on 7 desks and matching chairs.",
+      "internalDateMs": 1786168000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-088",
+      "from": "Ivy Osei <ivy@overlookclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status - PO 1008",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Checking on the status of PO 1008 - it's been over a week since we placed it.",
+      "internalDateMs": 1786170000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-089",
+      "from": "Declan Osei <declan@palisadeclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for 9 standing desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Looking for pricing on 9 height-adjustable standing desks, ideally with a walnut finish.",
+      "internalDateMs": 1786172000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-090",
+      "from": "Sasha Osei <sasha@quarryclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return authorization needed",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "We ordered 10 too many chairs by mistake. Can we get a return authorization?",
+      "internalDateMs": 1786174000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-091",
+      "from": "Theo Osei <theo@summitstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Availability check - reception seating",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Do you have reception seating (2 loveseats, 11 chairs) in stock, or is it a special order?",
+      "internalDateMs": 1786176000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-mix-092",
+      "from": "Paloma Osei <paloma@harborstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing hardware on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "One of the desks we received is missing mounting hardware. Can you send the missing parts?",
+      "internalDateMs": 1786178000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-03",
+      "from": "Owen Delacroix <owen@elmcourtrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for 18 conference chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, quote for 18 conference chairs. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786180000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-04",
+      "from": "Nadia Delacroix <nadia@fernbrookrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing request - 6 executive desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, pricing request - 6 executive desks. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786182000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-05",
+      "from": "Felix Delacroix <felix@graniterealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote needed: lobby seating set",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, quote needed: lobby seating set. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786184000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-06",
+      "from": "Renee Delacroix <renee@ironwoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Bulk quote - 30 task chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, bulk quote - 30 task chairs. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786186000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-07",
+      "from": "Marcus Delacroix <marcus@juniperrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing for modular workstations",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, pricing for modular workstations. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786188000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-08",
+      "from": "Ivy Delacroix <ivy@kestrelrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for outdoor break-room furniture",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, quote for outdoor break-room furniture. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786190000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-09",
+      "from": "Declan Delacroix <declan@latticerealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Rush quote - 10 desks by month end",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, rush quote - 10 desks by month end. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786192000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-10",
+      "from": "Sasha Delacroix <sasha@maplewoodrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Pricing request - filing cabinets x8",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, pricing request - filing cabinets x8. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786194000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-11",
+      "from": "Theo Delacroix <theo@nimbusrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Quote for training room tables",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, quote for training room tables. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786196000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-12",
+      "from": "Paloma Delacroix <paloma@overlookrealty.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Reception desk + 3 guest chairs quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Hi, reception desk + 3 guest chairs quote. Could you put together a quote for us? Happy to hop on a call if useful.",
+      "internalDateMs": 1786198000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-03",
+      "from": "Owen Nakamura <owen@anchorclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Broken armrest on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Broken armrest on delivery - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786200000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-04",
+      "from": "Nadia Nakamura <nadia@groveclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order #71234 still not delivered",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Order #71234 still not delivered - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786202000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-05",
+      "from": "Felix Nakamura <felix@meridianclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Refund question - returned filing cabinet",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Refund question - returned filing cabinet - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786204000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-06",
+      "from": "Renee Nakamura <renee@foxgloveclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Complaint - short-shipped desk order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Complaint - short-shipped desk order - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786206000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-07",
+      "from": "Marcus Nakamura <marcus@larkspurclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Chair arrived with torn upholstery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Chair arrived with torn upholstery - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786208000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-08",
+      "from": "Ivy Nakamura <ivy@hollowclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Order status check - PO 88213",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Order status check - PO 88213 - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786210000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-09",
+      "from": "Declan Nakamura <declan@pinecrestclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Return window question",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Return window question - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786212000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-10",
+      "from": "Sasha Nakamura <sasha@sableclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Damaged carton, unopened - need replacement",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Damaged carton, unopened - need replacement - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786214000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-11",
+      "from": "Theo Nakamura <theo@copperclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Late delivery on rush order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Late delivery on rush order - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786216000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-12",
+      "from": "Paloma Nakamura <paloma@thistleclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Missing drawer on cabinet shipment",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Missing drawer on cabinet shipment - could someone take a look and help us get this sorted?",
+      "internalDateMs": 1786218000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-01",
+      "from": "Owen Osei <owen@juniperclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Question about our latest invoice",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Question about our latest invoice - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786220000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-02",
+      "from": "Nadia Osei <nadia@kestrelclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Payment plan for outstanding balance",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Payment plan for outstanding balance - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786222000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-03",
+      "from": "Felix Osei <felix@latticeclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Can I get a copy of invoice #9931?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Can I get a copy of invoice #9931? - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786224000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-04",
+      "from": "Renee Osei <renee@maplewoodclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Billing discrepancy on recent order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Billing discrepancy on recent order - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786226000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-05",
+      "from": "Marcus Osei <marcus@nimbusclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Overcharged on last statement?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Overcharged on last statement? - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786228000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-06",
+      "from": "Ivy Osei <ivy@overlookclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Need updated W-9 for our records",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Need updated W-9 for our records - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786230000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-07",
+      "from": "Declan Osei <declan@palisadeclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Invoice total doesn't match the quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Invoice total doesn't match the quote - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786232000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-08",
+      "from": "Sasha Osei <sasha@quarryclinic.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Late fee question",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Late fee question - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786234000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-09",
+      "from": "Theo Osei <theo@summitstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Requesting itemized invoice",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Requesting itemized invoice - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786236000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-10",
+      "from": "Paloma Osei <paloma@harborstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Credit memo status for returned item",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Credit memo status for returned item - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786238000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-11",
+      "from": "Jamal Osei <jamal@cedarstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Tax exemption certificate for our account",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Tax exemption certificate for our account - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786240000000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-12",
+      "from": "Odette Osei <odette@unionstudio.example>",
+      "to": [
+        "info@hartleysons.example"
+      ],
+      "subject": "Duplicate charge on our card",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Duplicate charge on our card - could someone in billing take a look? Happy to send more detail if needed.",
+      "internalDateMs": 1786242000000,
+      "references": []
     }
   ],
   "sent": [
@@ -708,6 +2294,422 @@
       ],
       "bodyText": "Jo - please process for payment when you get a chance.\n\n[original message below]",
       "internalDateMs": 1785702400000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-03",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Quote for 18 conference chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786180050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-04",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Pricing request - 6 executive desks",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786182050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-05",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Quote needed: lobby seating set",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786184050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-06",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Bulk quote - 30 task chairs",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786186050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-07",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Pricing for modular workstations",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786188050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-08",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Quote for outdoor break-room furniture",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786190050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-09",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Rush quote - 10 desks by month end",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786192050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-10",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Pricing request - filing cabinets x8",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786194050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-11",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Quote for training room tables",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786196050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-quote-12",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "sales@hartleysons.example"
+      ],
+      "subject": "Fwd: Reception desk + 3 guest chairs quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Sales - can you follow up on this? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786198050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-03",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Broken armrest on delivery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786200050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-04",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Order #71234 still not delivered",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786202050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-05",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Refund question - returned filing cabinet",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786204050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-06",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Complaint - short-shipped desk order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786206050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-07",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Chair arrived with torn upholstery",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786208050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-08",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Order status check - PO 88213",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786210050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-09",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Return window question",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786212050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-10",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Damaged carton, unopened - need replacement",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786214050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-11",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Late delivery on rush order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786216050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-support-12",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "support@hartleysons.example"
+      ],
+      "subject": "Fwd: Missing drawer on cabinet shipment",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Support - please take a look. Thanks.\n\n[original message below]",
+      "internalDateMs": 1786218050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-01",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Question about our latest invoice",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786220050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-02",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Payment plan for outstanding balance",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786222050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-03",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Can I get a copy of invoice #9931?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786224050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-04",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Billing discrepancy on recent order",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786226050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-05",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Overcharged on last statement?",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786228050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-06",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Need updated W-9 for our records",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786230050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-07",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Invoice total doesn't match the quote",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786232050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-08",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Late fee question",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786234050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-09",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Requesting itemized invoice",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786236050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-10",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Credit memo status for returned item",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786238050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-11",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Tax exemption certificate for our account",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786240050000,
+      "references": []
+    },
+    {
+      "threadId": "hartley-billing-12",
+      "from": "Hartley & Sons <info@hartleysons.example>",
+      "to": [
+        "jo@hartleysons.example"
+      ],
+      "subject": "Fwd: Duplicate charge on our card",
+      "listId": null,
+      "attachments": [],
+      "bodyText": "Jo - can you take this one? Thanks.\n\n[original message below]",
+      "internalDateMs": 1786242050000,
       "references": []
     }
   ]
