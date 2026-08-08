@@ -83,7 +83,10 @@ function pgliteAdapter(p: PGlite): Querier {
   };
 }
 
-describe("clone-to-shadow, end to end on fakes", () => {
+// Generous timeout: this suite runs the REAL mining pipeline over the full 162-thread
+// fixture plus PGlite migrations — comfortably fast in isolation, but the vitest default
+// (5s) is too tight a margin on a loaded machine or cold CI runner.
+describe("clone-to-shadow, end to end on fakes", { timeout: 30_000 }, () => {
   let artifacts: Artifacts;
   let mail: ReturnType<typeof makeFakeMail>;
   let cfg: OfficeConfig;
