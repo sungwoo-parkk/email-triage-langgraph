@@ -63,7 +63,15 @@ export async function runMiningPipeline(
   mail: MailClient,
   cfg: OfficeConfig,
   classify: ClassifyFn,
-  log: (msg: string) => void = console.log
+  log: (msg: string) => void = console.log,
+  // Optional override for the classifier used to score the holdout (defaults to the real
+  // exemplar-tuned model, matching what a real `triage init` deploys). Callers that must
+  // stay offline/credential-free even when the holdout is non-empty - `--dry-run` and this
+  // package's own tests - pass their offline/fake classify here instead. Without this,
+  // any caller whose holdout happens to be non-empty unconditionally hits makeClassifier's
+  // real model call regardless of what `classify` (used for silver-labeling) was, which
+  // silently defeats the "no API keys" guarantee `--dry-run` documents. See Task 12 report.
+  evalClassify?: ClassifyFn
 ): Promise<Artifacts> {
   const { months, maxThreads } = cfg.mining;
 
@@ -105,8 +113,8 @@ export async function runMiningPipeline(
 
   let evalReport: EvalReport | null = null;
   if (holdout.length) {
-    const evalClassify = withNoRules(makeClassifier(cfg, exemplars));
-    evalReport = await runHoldoutEval(evalClassify, holdout);
+    const scorer = evalClassify ?? withNoRules(makeClassifier(cfg, exemplars));
+    evalReport = await runHoldoutEval(scorer, holdout);
     log(`Holdout eval: ${Math.round(evalReport.overallAgreement * 100)}% agreement over ${evalReport.evaluated} thread(s).`);
   } else {
     log(`Not enough labeled mail yet for a holdout eval.`);

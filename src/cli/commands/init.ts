@@ -64,7 +64,10 @@ async function runDryRun(): Promise<void> {
   const raw = JSON.parse(readFileSync(DRY_RUN_HISTORY, "utf8")) as { inbox?: ThreadSnapshot[]; sent?: ThreadSnapshot[] };
   const cfg = loadOfficeConfig(DRY_RUN_CONFIG);
   const mail = makeFakeMail(raw);
-  const artifacts = await runMiningPipeline(mail, cfg, offlineClassify(cfg));
+  // Eval must stay offline too - runMiningPipeline's holdout scorer defaults to a real
+  // model call (see Task 12 report), which would silently break --dry-run's "no API keys"
+  // promise the moment a real office's history is large enough to produce a holdout.
+  const artifacts = await runMiningPipeline(mail, cfg, offlineClassify(cfg), console.log, offlineClassify(cfg));
   writeArtifacts(ARTIFACTS_DIR, artifacts);
   console.log(`\nDry run complete. Wrote artifacts to ${ARTIFACTS_DIR} (deploy skipped — this was --dry-run).`);
   console.log(`Open ${path.join(ARTIFACTS_DIR, "triage-report.html")} to see the report.`);
@@ -77,8 +80,11 @@ async function runDryRun(): Promise<void> {
  * pipeline's shape (rules mined, a report rendered) offline; not a claim about real
  * classification quality. A real `triage init` (no --dry-run) always uses
  * makeClassifier(cfg, []), the actual model call.
+ *
+ * Exported so tests (Task 12's integration test) can reuse it instead of duplicating a
+ * near-identical keyword stub.
  */
-function offlineClassify(cfg: OfficeConfig): ClassifyFn {
+export function offlineClassify(cfg: OfficeConfig): ClassifyFn {
   const vocab = deriveVocabulary(cfg);
   return async (email) => {
     if (email.listId)
