@@ -1,8 +1,29 @@
 import type { OfficeConfig } from "./officeConfig";
 import { deriveVocabulary } from "./officeConfig";
 import type { LabeledThread } from "./mining";
+import type { Querier } from "./db";
 
 export interface Exemplar { categoryId: string; fromAddr: string; subject: string; bodyExcerpt: string; tier: "gold" | "llm" }
+
+/**
+ * Reads back the exemplars deploy.ts's seedExemplars wrote to the `exemplars` table.
+ * Finding I1: this table was written at deploy but never read anywhere at runtime — the
+ * ingest route built makeClassifier(officeCfg, []) unconditionally, so production ran an
+ * unpersonalized prompt while the onboarding report's numbers came from the exemplar-tuned
+ * classifier. Callers should pass this into makeClassifier instead of [].
+ */
+export async function loadExemplars(db: Querier): Promise<Exemplar[]> {
+  const { rows } = await db.query(
+    `select category_id, from_addr, subject, body_excerpt, tier from exemplars`
+  );
+  return rows.map((r: any) => ({
+    categoryId: r.category_id,
+    fromAddr: r.from_addr,
+    subject: r.subject,
+    bodyExcerpt: r.body_excerpt,
+    tier: r.tier,
+  }));
+}
 
 export const PROVIDER_PACKAGES: Record<string, string> = {
   openai: "@langchain/openai",

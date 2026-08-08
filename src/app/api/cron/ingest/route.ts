@@ -7,6 +7,7 @@ import { buildTriageGraph } from "@/graph/triage";
 import { getConfig } from "@/lib/config";
 import { runIngestBatch } from "@/lib/ingest";
 import { observeSentMail } from "@/lib/observer";
+import { loadExemplars } from "@/lib/promptgen";
 
 export const maxDuration = 300;
 
@@ -18,7 +19,11 @@ export async function GET(req: Request) {
   const officeCfg = await getOfficeConfig(db);
   if (!officeCfg) return NextResponse.json({ error: "office not configured" }, { status: 500 });
   const gmail = makeGmail();
-  const graph = buildTriageGraph({ db, mail: gmail, classify: makeClassifier(officeCfg, []) });
+  // Finding I1: this used to be makeClassifier(officeCfg, []) — the exemplars deploy.ts
+  // seeds into the `exemplars` table were written but never read, so production ran an
+  // unpersonalized prompt while the onboarding report's eval numbers came from the
+  // exemplar-tuned classifier.
+  const graph = buildTriageGraph({ db, mail: gmail, classify: makeClassifier(officeCfg, await loadExemplars(db)) });
 
   const { rows } = await db.query(`select checkpoint_ms from ingest_state where id = 1`);
   const checkpoint = Number(rows[0].checkpoint_ms);
