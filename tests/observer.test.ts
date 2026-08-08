@@ -8,6 +8,8 @@ import { normalize } from "@/lib/normalize";
 import { makeFakeMail } from "@/lib/mail/fake";
 import type { ThreadSnapshot } from "@/lib/mail/types";
 import { observeSentMail } from "@/lib/observer";
+import { executeDecision, makeContextBodyFor } from "@/lib/act";
+import { TRIAGE_MARKER } from "@/lib/review";
 
 // Same adapter as tests/officeStore.test.ts (migration 004's own suite): PGlite's
 // parameterized query() cannot run multi-statement DDL, so CREATE/INSERT/ALTER with
@@ -141,5 +143,52 @@ describe("observeSentMail", () => {
     expect(r.corrections).toBe(1);
     const { rows } = await getDb().query(`select category_id from corrections where thread_id='t-contra'`);
     expect(rows[0].category_id).toBe("support");
+  });
+});
+
+// Finding C2: at assisted+ stage, act.ts review-forwards a needs_review decision to
+// cfg.review.recipient - and review.recipient is typically ALSO a routee (the Hartley
+// example's "jo" is both). Left unfiltered, observeSentMail mistook that system-generated
+// forward for a human correction: 3 needs_review threads from one sender was enough to mint
+// a bogus purity-1.0 learned rule from a "correction" no human ever made. The fix is to skip
+// any sent snapshot whose body carries TRIAGE_MARKER (review.ts's buildContextBody always
+// opens with it) - these two tests prove the real act layer's own forward is now excluded,
+// while a genuine human forward (no marker) still counts.
+describe("observeSentMail: system review-forwards are not human corrections (finding C2)", () => {
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg);
+  });
+
+  it("a review-forward the real act layer sends at assisted stage does NOT create a correction", async () => {
+    const decisionId = await seedNeedsReview(getDb(), "t-poison");
+    // Seed the fake mail's sent history near NOW so its deterministic forward-date counter
+    // (see src/lib/mail/fake.ts) starts near NOW too, landing the act layer's forward inside
+    // the window observeSentMail will scan below.
+    const mail = makeFakeMail({ sent: [snap("seed", { to: ["nobody@nowhere.example"], internalDateMs: NOW - 2000 })] });
+    const ctx = { vocab, contextBodyFor: makeContextBodyFor(getDb(), vocab) };
+
+    await executeDecision(getDb(), mail, decisionId, { stage: "assisted", autoActLabels: [] }, ctx);
+    const forwarded = mail.log.find((l) => l.startsWith(`forward:t-poison:${REVIEW}:`));
+    expect(forwarded).toBeTruthy(); // sanity: the review-forward actually ran and reached the reviewer
+    expect(forwarded).toContain(TRIAGE_MARKER);
+
+    const r = await observeSentMail(getDb(), mail, cfg, NOW);
+    expect(r.corrections).toBe(0);
+    const { rows } = await getDb().query(`select 1 from corrections where thread_id='t-poison'`);
+    expect(rows).toHaveLength(0);
+  });
+
+  it("a genuine human forward (no TRIAGE_MARKER) of the same shape still records a correction", async () => {
+    await seedNeedsReview(getDb(), "t-human");
+    const mail = makeFakeMail({
+      sent: [snap("t-human", { to: [REVIEW], bodyText: "Jo - can you take this one? Thanks - reception", internalDateMs: NOW - 1000 })],
+    });
+    const r = await observeSentMail(getDb(), mail, cfg, NOW);
+    expect(r.corrections).toBe(1);
+    const { rows } = await getDb().query(`select category_id from corrections where thread_id='t-human'`);
+    expect(rows[0].category_id).toBe("jo");
   });
 });

@@ -2,6 +2,7 @@ import type { Querier } from "./db";
 import type { MailClient, ThreadSnapshot } from "./mail/types";
 import type { OfficeConfig } from "./officeConfig";
 import { detectForwards } from "./forwardDetect";
+import { TRIAGE_MARKER } from "./review";
 
 export async function observeSentMail(db: Querier, mail: MailClient, cfg: OfficeConfig, nowMs: number) {
   const { rows } = await db.query(`select checkpoint_ms from ingest_state where id = 2`);
@@ -9,6 +10,17 @@ export async function observeSentMail(db: Querier, mail: MailClient, cfg: Office
 
   const sent = await mail.listNewThreads(since, { sent: true });
   if (!sent.length) return { corrections: 0, promoted: 0 };
+
+  // At assisted+ stage, act.ts's own review-forwards (to cfg.review.recipient) land in this
+  // same sent-mail feed - and review.recipient is typically ALSO a routee address (e.g. the
+  // Hartley example's "jo"), so an unfiltered scan mistakes the system's own automated
+  // forward for a human correction. 3 needs_review threads from one sender is then enough
+  // to mint a bogus purity-1.0 learned rule from a "correction" no human ever made. Every
+  // system-sent forward (review-forward or routee forward) starts with TRIAGE_MARKER
+  // (review.ts's buildContextBody); a genuine human forward never does. Still counted
+  // toward the checkpoint below - just excluded from correction detection - so they aren't
+  // re-fetched forever.
+  const humanSent = sent.filter((s) => !s.bodyText.includes(TRIAGE_MARKER));
 
   // Only threads the system knows about can be corrected.
   const known = await db.query(`select thread_id, from_addr, subject, internal_date_ms from threads`);
@@ -18,7 +30,7 @@ export async function observeSentMail(db: Querier, mail: MailClient, cfg: Office
   }));
 
   let corrections = 0;
-  for (const g of detectForwards(sent, inbox, cfg.routees)) {
+  for (const g of detectForwards(humanSent, inbox, cfg.routees)) {
     const dec = await db.query(
       `select id, final_tasks, status from decisions where thread_id = $1 order by id desc limit 1`, [g.threadId]);
     if (!dec.rows.length) continue;
