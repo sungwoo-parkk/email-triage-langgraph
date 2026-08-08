@@ -70,6 +70,26 @@ describe("minePatterns", () => {
   });
 });
 
+describe("minePatterns: list_id with spaces (finding I3)", () => {
+  it("mines the full list-id pattern verbatim, not just its first word", () => {
+    // A display-name-prefixed List-Id header, exactly the shape that used to get
+    // space-truncated by the old `${patternType} ${pattern}`.split(" ") bucket key.
+    const listId = "Weekly Deals <deals.x.list-id.example>";
+    const rows: LabeledThread[] = Array.from({ length: 6 }, (_, i) => ({
+      email: normalize({
+        threadId: `ld${i}`, from: `p${i}@weeklydeals.example`, to: [], subject: "s",
+        listId, attachments: [], bodyText: "b", internalDateMs: 1, references: [],
+      }),
+      categoryIds: ["junk"], tier: "gold",
+    }));
+    const rules = minePatterns(rows);
+    const rule = rules.find((r) => r.patternType === "list_id");
+    expect(rule).toBeDefined();
+    expect(rule?.pattern).toBe(listId.toLowerCase());
+    expect(rule?.pattern).not.toBe("weekly"); // regression: used to truncate at the first space
+  });
+});
+
 describe("seedMinedRules", () => {
   beforeAll(async () => {
     const p = new PGlite();
