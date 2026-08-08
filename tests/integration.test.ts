@@ -37,21 +37,31 @@ const FILL_BASE = 1786000000000;
  * splitHoldout's gold-first fill) drain every officesupply.example thread out of training.
  * This pushes both: more gold vendor same-thread forwards (so some survive training after
  * holdout extraction) and plain silver filler (so the labeled pool clears the 30-thread floor).
+ *
+ * Thread IDs are prefixed "aaa-fill-..." (sorting before every "hartley-..." real fixture
+ * id) so splitHoldout's gold-first, then-threadId-alphabetical fill drains synthetic filler
+ * into the holdout ahead of the real history.json vendor threads, leaving the real threads
+ * in train to drive the mined rule test 1 asserts on - see REAL_VENDOR_IDS below.
  */
 function pushMiningFiller(mail: ReturnType<typeof makeFakeMail>): void {
   const KINDS = ["Quote for chairs", "Invoice question", "Return request"];
   for (let i = 0; i < 40; i++) {
-    const threadId = `hartley-vendor-fill-${i}`;
+    const threadId = `aaa-fill-vendor-${String(i).padStart(3, "0")}`;
     const dateMs = FILL_BASE + i * 100_000;
     mail.pushInbox(snap({ threadId, from: VENDOR_FROM, subject: `Monthly statement #${2000 + i}`, bodyText: "Amount due.", internalDateMs: dateMs }));
     mail.pushSent(snap({ threadId, from: HARTLEY_FROM, to: [JO], subject: `Fwd: Monthly statement #${2000 + i}`, internalDateMs: dateMs + 50_000 }));
   }
   for (let i = 0; i < 90; i++)
     mail.pushInbox(snap({
-      threadId: `filler-${i}`, from: `p${i}@filler${i}.example`, subject: `${KINDS[i % 3]} #${i}`,
+      threadId: `aaa-fill-${String(i).padStart(3, "0")}`, from: `p${i}@filler${i}.example`, subject: `${KINDS[i % 3]} #${i}`,
       bodyText: "filler body for holdout volume", internalDateMs: FILL_BASE + 10_000_000 + i * 1000,
     }));
 }
+
+// history.json's real forwarded vendor threads (8/8 forwarded to jo@ - see Task 11). Test 1
+// asserts at least 5 of these survived splitHoldout into `train` (not swept into holdout),
+// so the mined-gold rule it checks is anchored to real fixture content, not just filler.
+const REAL_VENDOR_IDS = Array.from({ length: 8 }, (_, i) => `hartley-vendor-0${i + 1}`);
 
 // Fresh thread from the office's own known vendor domain - the mined-gold rule from
 // pushMiningFiller/history.json should catch this without ever calling the classifier.
@@ -120,8 +130,16 @@ describe("clone-to-shadow, end to end on fakes", () => {
   });
 
   it("mines a gold rule from the forwarded vendor domain", () => {
+    // Structural anchor: prove the rule below is built from REAL history.json forwards, not
+    // just synthetic filler - fails if a sort-order regression ever sweeps the real vendor
+    // threads into the holdout (excluded from mining) instead of the filler.
+    const holdoutIds = new Set(artifacts.holdout.map((l) => l.email.threadId));
+    const survivingReal = REAL_VENDOR_IDS.filter((id) => !holdoutIds.has(id));
+    expect(survivingReal.length).toBeGreaterThanOrEqual(5);
+
     const vendor = artifacts.minedRules.find((r) => r.pattern === "officesupply.example");
     expect(vendor).toMatchObject({ tier: "mined-gold", categoryIds: ["jo"] });
+    expect(vendor?.support).toBeGreaterThanOrEqual(8); // at least the 8 real vendor threads
   });
 
   it("produces an eval report and the HTML artifact", () => {
@@ -150,8 +168,10 @@ describe("clone-to-shadow, end to end on fakes", () => {
       mail.pushSent(fwd);
       await observeSentMail(getDb(), mail, cfg, fwd.internalDateMs + 100_000); // 3 calls, advancing nowMs
     }
-    const { rows } = await getDb().query(`select source from rules where pattern = 'billing@newvendor.example'`);
+    const { rows } = await getDb().query(`select source, label_set from rules where pattern = 'billing@newvendor.example'`);
     expect(rows[0]?.source).toBe("learned"); // spec §13 criterion 3: sender_exact @ 3/3 purity 1.0 promotes
+    const labelSet = typeof rows[0]?.label_set === "string" ? JSON.parse(rows[0].label_set) : rows[0]?.label_set;
+    expect(labelSet).toEqual(["jo"]);
   });
 
   it("builds a digest naming the day's activity", async () => {
