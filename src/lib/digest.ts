@@ -1,4 +1,6 @@
 import type { Querier } from "./db";
+import { getConfig } from "./config";
+import { agreementWindow } from "./agreement";
 
 interface StatusCounts { decided: number; acted: number; needs_review: number; failed: number }
 
@@ -44,7 +46,7 @@ async function correctionsCount(db: Querier, sinceMs: number): Promise<number> {
  * automatically" while the report's own promise is "nothing sends automatically" -
  * so shadow-stage intent gets a separate, truthfully-worded body line instead.
  */
-export async function buildDigest(db: Querier, sinceMs: number): Promise<{ subject: string; body: string }> {
+export async function buildDigest(db: Querier, sinceMs: number, nowMs = Date.now()): Promise<{ subject: string; body: string }> {
   const counts = await countsByStatus(db, sinceMs);
   const failures = await recentFailures(db, sinceMs);
   const corrections = await correctionsCount(db, sinceMs);
@@ -80,6 +82,19 @@ export async function buildDigest(db: Querier, sinceMs: number): Promise<{ subje
       ? `${corrections} correction${corrections === 1 ? "" : "s"} observed from forwarded mail - the system is learning from them.`
       : `No corrections observed.`
   );
+
+  // Spec 2026-08-10 §2.5: while shadowing, surface the measured 14-day agreement (or its
+  // honest absence) so the office sees the promotion evidence accumulate without running status.
+  const appCfg = await getConfig(db);
+  if (appCfg.stage === "shadow") {
+    const w = await agreementWindow(db, nowMs - 14 * 24 * 3600_000, nowMs);
+    lines.push(
+      "",
+      w.n
+        ? `Shadow agreement (last 14 days): ${Math.round((w.rate ?? 0) * 100)}% over ${w.n} measured high-confidence decision${w.n === 1 ? "" : "s"} — run \`triage status\` for the promotion gate.`
+        : `Shadow agreement (last 14 days): nothing measured yet — no human forwards have matched a recorded decision.`
+    );
+  }
 
   return { subject, body: lines.join("\n") };
 }

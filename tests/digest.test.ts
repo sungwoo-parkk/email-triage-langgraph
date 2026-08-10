@@ -8,6 +8,7 @@ import { executeDecision, makeContextBodyFor } from "@/lib/act";
 import { makeFakeMail } from "@/lib/mail/fake";
 import { normalize } from "@/lib/normalize";
 import { buildDigest } from "@/lib/digest";
+import { setConfigKey } from "@/lib/config";
 
 // Same PGlite adapter as tests/observer.test.ts: parameterized query() can't run
 // multi-statement DDL, so param-less CREATE/INSERT/ALTER go through exec() instead.
@@ -148,5 +149,61 @@ describe("buildDigest", () => {
     await getDb().query(`update decisions set created_at = now() - interval '2 hours' where id = $1`, [oldId]);
     const { subject } = await buildDigest(getDb(), sinceMs);
     expect(subject).toBe("[triage] daily digest — 1 routed, 2 waiting, 1 errors"); // "old" predates sinceMs
+  });
+});
+
+describe("buildDigest: shadow-agreement line (spec 2026-08-10 §2.5)", () => {
+  const NOW2 = 1_800_000_000_000;
+  const DAY2 = 24 * 3600_000;
+  const cfg2 = loadOfficeConfig("examples/hartley/triage.config.json");
+  const vocab2 = deriveVocabulary(cfg2);
+  const noRules2 = { hits: [], labels: [], forwards: [], complete: false };
+
+  function adapter(p: PGlite): Querier {
+    return {
+      query: async (sql, params) => {
+        if (!params || params.length === 0) {
+          const t = sql.trim().toUpperCase();
+          if (t.startsWith("CREATE") || t.startsWith("INSERT") || t.startsWith("ALTER")) {
+            await p.exec(sql);
+            return { rows: [] };
+          }
+        }
+        return p.query(sql, params as any[]) as any;
+      },
+    };
+  }
+
+  async function seedMeasured(db: Querier, threadId: string, createdAtMs: number) {
+    const email = normalize({ threadId, from: "a@vendor.example", to: [], subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: createdAtMs, references: [] });
+    const llm = { tasks: [{ category: "sales" }], confidence: "high" as const, rationale: "t" };
+    const d = decide(vocab2, cfg2.review.recipient, noRules2, llm, { stage: "shadow" as const, autoActLabels: ["sales"] });
+    const id = await recordDecision(db, email, noRules2, llm, d, "shadow", null);
+    await db.query(`update decisions set created_at = to_timestamp($1 / 1000.0) where id = $2`, [createdAtMs, id]);
+    await db.query(`insert into observations (thread_id, decision_id, category_id) values ($1,$2,$3)`, [threadId, id, "sales"]);
+  }
+
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(adapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg2);
+  });
+
+  it("shadow stage with a measured decision includes the agreement line", async () => {
+    await seedMeasured(getDb(), "t-dig", NOW2 - 2 * DAY2);
+    const { body } = await buildDigest(getDb(), NOW2 - DAY2, NOW2);
+    expect(body).toMatch(/Shadow agreement \(last 14 days\): 100% over 1 measured high-confidence decision/);
+  });
+
+  it("shadow stage with nothing measured says so honestly", async () => {
+    const { body } = await buildDigest(getDb(), NOW2 - DAY2, NOW2);
+    expect(body).toContain("Shadow agreement (last 14 days): nothing measured yet");
+  });
+
+  it("non-shadow stage omits the line", async () => {
+    await setConfigKey(getDb(), "stage", "assisted");
+    const { body } = await buildDigest(getDb(), NOW2 - DAY2, NOW2);
+    expect(body).not.toContain("Shadow agreement");
   });
 });
