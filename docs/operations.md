@@ -23,6 +23,8 @@ Postgres, and the office's Gmail account.
 
 Stages: `shadow` (record only) → `assisted` (labels only) → `autonomous` (labels + forwards). Changes are manual, owner-approved, evidence-attached (promotion gates in [product.md](product.md)).
 
+`triage promote` from shadow is evidence-gated: it prints the measured agreement windows and refuses unless both trailing 7-day windows have ≥25 measured high-confidence decisions at ≥85% exact-set agreement. `--force` overrides after recording your stated reason and the full evidence to `app_config.promotion_override` — the override is auditable, never silent.
+
 ```sql
 -- Set the stage (value is JSON — keep the quotes):
 insert into app_config (key, value) values ('stage', '"assisted"'::jsonb)
