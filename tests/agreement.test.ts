@@ -10,7 +10,7 @@ import { getConfig } from "@/lib/config";
 import { parseCliArgs } from "@/cli/main";
 import { run as promoteRun } from "@/cli/commands/promote";
 import { run as statusRun } from "@/cli/commands/status";
-import { ask } from "@/cli/confirm";
+import { ask, confirm } from "@/cli/confirm";
 
 // confirm()/ask() read stdin, which vitest has no TTY for; both resolve to the same
 // src/cli/confirm.ts whether imported as "../confirm" or "@/cli/confirm", so this
@@ -275,6 +275,13 @@ describe("triage promote: evidence-gated shadow -> assisted", () => {
 
   it("--force with an empty reason cancels without writing", async () => {
     vi.mocked(ask).mockResolvedValueOnce("");
+    await promoteRun({ command: "promote", dryRun: false, config: undefined, force: true });
+    expect((await getConfig(getDb())).stage).toBe("shadow");
+    expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);
+  });
+
+  it("--force then cancelling at confirm leaves no override record", async () => {
+    vi.mocked(confirm).mockResolvedValueOnce(false);
     await promoteRun({ command: "promote", dryRun: false, config: undefined, force: true });
     expect((await getConfig(getDb())).stage).toBe("shadow");
     expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);

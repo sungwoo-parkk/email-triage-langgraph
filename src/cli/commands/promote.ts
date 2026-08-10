@@ -23,6 +23,7 @@ export async function run(args: CliArgs): Promise<void> {
 
   // shadow -> assisted is evidence-gated (spec 2026-08-10 §2.5). assisted -> autonomous
   // keeps confirm-only behavior: its correction-rate gate is out of this spec's scope.
+  let forced: { reason: string; evidence: Awaited<ReturnType<typeof gateEvidence>> } | null = null;
   if (cfg.stage === "shadow") {
     const evidence = await gateEvidence(db, Date.now());
     console.log(renderEvidence(evidence));
@@ -38,8 +39,7 @@ export async function run(args: CliArgs): Promise<void> {
         console.log("No reason given — cancelled.");
         return;
       }
-      await recordForcedPromotion(db, cfg.stage, next, reason, evidence);
-      console.log("Override recorded to app_config.promotion_override.");
+      forced = { reason, evidence };
     }
   }
 
@@ -50,6 +50,9 @@ export async function run(args: CliArgs): Promise<void> {
     return;
   }
 
+  if (forced) {
+    await recordForcedPromotion(db, cfg.stage, next, forced.reason, forced.evidence);
+  }
   await setConfigKey(db, "stage", next);
-  console.log(`Promoted to "${next}".`);
+  console.log(`Promoted to "${next}".` + (forced ? " Override recorded to app_config.promotion_override." : ""));
 }
