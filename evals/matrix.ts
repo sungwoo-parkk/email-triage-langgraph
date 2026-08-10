@@ -1,12 +1,12 @@
 /**
  * Sequential Gemini-tier eval runner with fail-closed doc regeneration.
  *
- *   npm run eval-matrix              # run all configured tiers, update evals/README.md
+ *   npm run eval-matrix              # run all configured tiers, update docs/evals.md
  *   EVAL_MATRIX_MODELS=... npm run eval-matrix   # override tier list (comma-separated)
  *
  * Requires: LANGSMITH_API_KEY, GEMINI_API_KEY (classification + judges).
  * Baseline-tier failure → doc NOT rewritten, exit 1.
- * Any tier failure → exit 1.
+ * Any tier failure → exit 1, but all tiers complete; failed tiers render as failed rows.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -15,6 +15,7 @@ import { runEval, type EvalSummary } from "./run";
 import { renderMatrixTable, replaceBetweenMarkers, type TierRow } from "./matrixTable";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const EVALS_DOC = path.join(HERE, "..", "docs", "evals.md");
 
 const BASELINE = "google_genai:gemini-3.6-flash"; // ids verified against the live models API 2026-08-10 (controller)
 const TIERS = process.env.EVAL_MATRIX_MODELS?.split(",").map((s) => s.trim()).filter(Boolean) ?? [
@@ -34,16 +35,17 @@ const PRICES: Record<string, { inPerM: number; outPerM: number }> = {
 };
 
 async function matrix(): Promise<void> {
+  // Env preflight.
+  for (const v of ["LANGSMITH_API_KEY", "GEMINI_API_KEY"]) {
+    if (!process.env[v]) { console.error(`${v} is required`); process.exit(1); }
+  }
+
   const rows: TierRow[] = [];
 
-  // Sequential tier loop: if baseline fails, don't rewrite doc and exit 1.
-  // Any tier failure exits 1.
-  for (let i = 0; i < TIERS.length; i++) {
-    const model = TIERS[i];
-    const isBaseline = model === BASELINE;
-
+  // Sequential tier loop: collect all results; no exit inside loop.
+  for (const model of TIERS) {
     try {
-      console.log(`running eval on tier ${i + 1}/${TIERS.length}: ${model}`);
+      console.log(`running eval on tier ${TIERS.indexOf(model) + 1}/${TIERS.length}: ${model}`);
       const summary: EvalSummary = await runEval({ model, judges: true });
       const row: TierRow = {
         model,
@@ -63,35 +65,34 @@ async function matrix(): Promise<void> {
         price: PRICES[model] ?? null,
       };
       rows.push(row);
-
-      // Baseline failure: don't rewrite doc, exit 1.
-      if (isBaseline) {
-        console.error("MATRIX FAILED: baseline tier failed; doc not rewritten");
-        process.exit(1);
-      }
-      // Any tier failure: exit 1.
-      console.error("MATRIX FAILED: tier failed");
-      process.exit(1);
     }
   }
 
-  // All tiers passed: update the doc.
+  // Baseline failure: exit before any doc read/write.
+  if (!rows.find((r) => r.model === BASELINE)?.ok) {
+    console.error("MATRIX FAILED: baseline tier failed; doc not rewritten");
+    process.exit(1);
+  }
+
+  // Write doc with all tier results (including failed siblings if any).
   try {
     const markdown = renderMatrixTable(rows, PRICE_AS_OF);
-    const docPath = path.join(HERE, "..", "evals", "README.md");
-    const doc = readFileSync(docPath, "utf8");
+    const doc = readFileSync(EVALS_DOC, "utf8");
     const updated = replaceBetweenMarkers(
       doc,
       "<!-- eval-matrix:start -->",
       "<!-- eval-matrix:end -->",
       markdown
     );
-    writeFileSync(docPath, updated, "utf8");
-    console.log(`\nupdated ${docPath}`);
+    writeFileSync(EVALS_DOC, updated, "utf8");
+    console.log(`\nupdated ${EVALS_DOC}`);
   } catch (err) {
     console.error("MATRIX FAILED:", err instanceof Error ? err.message : err);
     process.exit(1);
   }
+
+  // Exit 0 if all passed, 1 if any failed (but doc was written).
+  process.exit(rows.every((r) => r.ok) ? 0 : 1);
 }
 
 if (process.argv[1]?.endsWith("matrix.ts")) matrix().then(() => process.exit(0)).catch((e) => { console.error("MATRIX FAILED:", e); process.exit(1); });
