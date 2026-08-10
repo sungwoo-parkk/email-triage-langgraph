@@ -21,7 +21,7 @@ import { makeClassifier } from "../src/lib/classify";
 import { loadOfficeConfig } from "../src/lib/officeConfig";
 import {
   exactSetMatch, taskCountMatch, forwardMatch, latencySeconds,
-  faithfulness, instructionFollowing,
+  faithfulness, instructionFollowing, inputTokens, outputTokens,
 } from "./evaluators";
 
 const DATASET = "email-triage-goldens";
@@ -101,20 +101,18 @@ async function ensureDataset(client: Client, sync: boolean): Promise<void> {
   console.log(`dataset "${DATASET}" uploaded: ${translated.length} examples`);
 }
 
-async function main() {
-  // The case-study eval always targets examples/agency/triage.config.json (the flagship,
-  // hardest-taxonomy example office — see docs/case-study/) so it exercises the same
-  // classifier surface (office-config category ids) that any other office's onboarding
-  // eval does, on a fixed dataset for regression tracking across model/prompt changes.
+export interface EvalOptions { model?: string; limit?: number | null; judges?: boolean; sync?: boolean }
+export interface EvalSummary { model: string; promptVersion: string; experimentName: string; metrics: Record<string, { mean: number; n: number }> }
+
+export async function runEval(opts: EvalOptions = {}): Promise<EvalSummary> {
+  const { limit = null, judges = true, sync = false } = opts;
+  // Always the flagship example office (fixed dataset, regression tracking) — only the
+  // model may vary per call; every Gemini tier shares cfg.llm.apiKeyEnv (GEMINI_API_KEY).
   const cfg = loadOfficeConfig(path.join(HERE, "..", "examples/agency/triage.config.json"));
+  if (opts.model) cfg.llm.model = opts.model;
   for (const v of ["LANGSMITH_API_KEY", cfg.llm.apiKeyEnv]) {
-    if (!process.env[v]) { console.error(`${v} is required`); process.exit(1); }
+    if (!process.env[v]) throw new Error(`${v} is required`);
   }
-  const args = process.argv.slice(2);
-  const noJudges = args.includes("--no-judges");
-  const sync = args.includes("--sync");
-  const limitIdx = args.indexOf("--limit");
-  const limit = limitIdx >= 0 ? Number(args[limitIdx + 1]) : null;
 
   const client = new Client();
   await ensureDataset(client, sync);
@@ -131,27 +129,22 @@ async function main() {
     return { ...c, latency_ms: Date.now() - t0 };
   };
 
-  const evaluators: any[] = [exactSetMatch, taskCountMatch, forwardMatch, latencySeconds];
-  if (!noJudges) evaluators.push(faithfulness, instructionFollowing);
+  const evaluators: any[] = [exactSetMatch, taskCountMatch, forwardMatch, latencySeconds, inputTokens, outputTokens];
+  if (judges) evaluators.push(faithfulness, instructionFollowing);
 
   let promptVersion = "unversioned";
   try { promptVersion = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: path.join(HERE, "..") }).toString().trim(); } catch {}
   const model = cfg.llm.model;
 
-  const data = limit
-    ? client.listExamples({ datasetName: DATASET, limit })
-    : DATASET;
-
+  const data = limit ? client.listExamples({ datasetName: DATASET, limit }) : DATASET;
   const results = await evaluate(target, {
     data: data as any,
     evaluators,
     experimentPrefix: `${model}@${promptVersion}`,
     maxConcurrency: 4,
-    metadata: { model, promptVersion, judges: String(!noJudges) },
+    metadata: { model, promptVersion, judges: String(judges) },
   });
 
-  // Aggregate mean per metric for the console summary. evaluate() has already
-  // consumed the async iterator; the materialized rows live on results.results.
   const sums = new Map<string, { total: number; n: number }>();
   for (const r of results.results) {
     for (const er of r.evaluationResults?.results ?? []) {
@@ -160,12 +153,38 @@ async function main() {
       sums.set(er.key, s);
     }
   }
-  console.log(`\nexperiment: ${results.experimentName}`);
-  for (const [key, { total, n }] of [...sums.entries()].sort()) {
-    const mean = n ? total / n : NaN;
-    console.log(`  ${key.padEnd(22)} ${key === "latency_s" ? mean.toFixed(2) + "s mean" : (mean * 100).toFixed(1) + "%"}  (n=${n})`);
+  const metrics: EvalSummary["metrics"] = {};
+  for (const [key, { total, n }] of sums) metrics[key] = { mean: n ? total / n : NaN, n };
+  return { model, promptVersion, experimentName: results.experimentName, metrics };
+}
+
+function fmt(key: string, mean: number): string {
+  if (key === "latency_s") return `${mean.toFixed(2)}s mean`;
+  if (key.endsWith("_tokens")) return `${Math.round(mean)} mean`;
+  return `${(mean * 100).toFixed(1)}%`;
+}
+
+async function cli() {
+  const args = process.argv.slice(2);
+  const flag = (name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
+  const summary = await runEval({
+    model: flag("--model"),
+    limit: flag("--limit") ? Number(flag("--limit")) : null,
+    judges: !args.includes("--no-judges"),
+    sync: args.includes("--sync"),
+  });
+  console.log(`\nexperiment: ${summary.experimentName}`);
+  for (const key of Object.keys(summary.metrics).sort())
+    console.log(`  ${key.padEnd(22)} ${fmt(key, summary.metrics[key].mean)}  (n=${summary.metrics[key].n})`);
+  const jsonPath = flag("--json");
+  if (jsonPath) {
+    const { writeFileSync } = await import("node:fs");
+    writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
+    console.log(`wrote ${jsonPath}`);
   }
   console.log(`\nview: https://smith.langchain.com -> Datasets & Experiments -> ${DATASET}`);
 }
 
-main().then(() => process.exit(0)).catch((e) => { console.error("EVAL FAILED:", e); process.exit(1); });
+// Import guard (matches src/cli/main.ts): evals/matrix.ts imports runEval — the CLI must not
+// fire on import.
+if (process.argv[1]?.endsWith("run.ts")) cli().then(() => process.exit(0)).catch((e) => { console.error("EVAL FAILED:", e); process.exit(1); });
