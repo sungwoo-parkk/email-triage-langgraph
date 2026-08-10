@@ -45,7 +45,13 @@ fail-closed: the table is only rewritten when the baseline row succeeds).
 Tiers compared: `gemini-3.5-flash-lite`, `gemini-3.6-flash` (the production baseline), and `gemini-3.1-pro-preview` — the current lite/flash/pro siblings verified against the models API.
 
 <!-- eval-matrix:start -->
-_Not yet generated — run `npm run eval-matrix`._
+| Model | Exact-set | Task-split | Forward | Faithfulness | Instr.-following | Latency (mean) | Cost / 1K emails |
+|---|---|---|---|---|---|---|---|
+| gemini-3.5-flash-lite | 91.0% | 100.0% | 100.0% | 98.5% | 76.9% | 0.62s | $0.33 |
+| gemini-3.6-flash | 82.1% | 100.0% | 98.5% | 100.0% | 76.1% | 2.31s | $1.20 |
+| gemini-3.1-pro-preview | 86.6% | 100.0% | 98.5% | 100.0% | 77.6% | 3.36s | $1.88 |
+
+_Cost = measured mean tokens/email × published prices as of 2026-08; judges pinned to `GEMINI_JUDGE_MODEL` for every row; "—" = usage or price unavailable (never estimated)._
 <!-- eval-matrix:end -->
 
 ## Running
