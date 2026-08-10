@@ -5,6 +5,8 @@ import { runMigrations } from "@/lib/migrate";
 import { loadOfficeConfig, deriveVocabulary, setOfficeConfig } from "@/lib/officeConfig";
 import { decide, recordDecision } from "@/lib/decide";
 import { normalize } from "@/lib/normalize";
+import { agreementWindow, gateEvidence, renderEvidence, recordForcedPromotion, MIN_WINDOW_N } from "@/lib/agreement";
+import { getConfig } from "@/lib/config";
 
 // Same adapter as tests/observer.test.ts: PGlite's parameterized query() cannot run
 // multi-statement DDL, so no-param CREATE/INSERT/ALTER goes through exec().
@@ -113,5 +115,87 @@ describe("migration 005: v_agreement exact-set semantics", () => {
     expect(Number(support.predicted_n)).toBe(0);
     expect(Number(support.observed_n)).toBe(1); // t2's human forward
     expect(Number(support.match_n)).toBe(0);
+  });
+});
+
+describe("agreement gate (spec 2026-08-10 §2.4)", () => {
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg);
+  });
+
+  // Seeds `total` measured high-confidence decisions into a window, `agreeing` of them agreed.
+  async function seedWindow(prefix: string, baseMs: number, total: number, agreeing: number) {
+    for (let i = 0; i < total; i++) {
+      const id = await seedHighConfidence(getDb(), `${prefix}-${i}`, ["sales"], baseMs + i * 60_000);
+      await observe(getDb(), id, `${prefix}-${i}`, i < agreeing ? "sales" : "support");
+    }
+  }
+
+  it("agreementWindow honors [since, until) on decision created_at", async () => {
+    const id = await seedHighConfidence(getDb(), "edge", ["sales"], NOW - 8 * DAY);
+    await observe(getDb(), id, "edge", "sales");
+    const older = await agreementWindow(getDb(), NOW - 14 * DAY, NOW - 7 * DAY);
+    const newer = await agreementWindow(getDb(), NOW - 7 * DAY, NOW);
+    expect(older.n).toBe(1);
+    expect(newer.n).toBe(0);
+  });
+
+  it("low/medium-confidence and rule decisions never enter the gate population", async () => {
+    // needs_review path: llm=null -> confidence "low", final_tasks [] — observed but filtered out.
+    const email = normalize({ threadId: "t-low", from: "a@vendor.example", to: [], subject: "s", listId: null, attachments: [], bodyText: "b", internalDateMs: NOW - DAY, references: [] });
+    const d = decide(vocab, REVIEW, noRules, null, { stage: "shadow" as const, autoActLabels: [] });
+    const id = await recordDecision(getDb(), email, noRules, null, d, "shadow", null);
+    await observe(getDb(), id, "t-low", "sales");
+    expect((await agreementWindow(getDb(), NOW - 14 * DAY, NOW)).n).toBe(0);
+  });
+
+  it("both windows at n>=25 and >=85% -> gate MET; window under sample floor -> NOT met even at 100%", async () => {
+    await seedWindow("w1", NOW - 13 * DAY, 25, 23); // 92% older window
+    await seedWindow("w2", NOW - 6 * DAY, 25, 22);  // 88% newer window
+    const met = await gateEvidence(getDb(), NOW);
+    expect(met.windows[0].met).toBe(true);
+    expect(met.windows[1].met).toBe(true);
+    expect(met.met).toBe(true);
+  });
+
+  it("a window at 84% fails the gate", async () => {
+    await seedWindow("w1", NOW - 13 * DAY, 25, 25);
+    await seedWindow("w2", NOW - 6 * DAY, 25, 21); // 84% < 85%
+    const e = await gateEvidence(getDb(), NOW);
+    expect(e.windows[1].met).toBe(false);
+    expect(e.met).toBe(false);
+  });
+
+  it("a 100% window under MIN_WINDOW_N fails; unmeasured decisions are counted and excluded", async () => {
+    await seedWindow("w1", NOW - 13 * DAY, MIN_WINDOW_N - 1, MIN_WINDOW_N - 1); // 24/24 = 100%, n too small
+    await seedWindow("w2", NOW - 6 * DAY, 25, 25);
+    await seedHighConfidence(getDb(), "untouched", ["sales"], NOW - 3 * DAY); // no observation
+    const e = await gateEvidence(getDb(), NOW);
+    expect(e.windows[0].met).toBe(false);
+    expect(e.met).toBe(false);
+    expect(e.unmeasured).toBe(1);
+    expect(e.overall.n).toBe(49); // untouched thread is NOT in the denominator
+  });
+
+  it("renderEvidence states the verdict and the honest-denominator rule", async () => {
+    const e = await gateEvidence(getDb(), NOW);
+    const text = renderEvidence(e);
+    expect(text).toContain("NOT met");
+    expect(text).toContain("unmeasured");
+  });
+
+  it("recordForcedPromotion writes the audit record and getConfig still parses", async () => {
+    const e = await gateEvidence(getDb(), NOW);
+    await recordForcedPromotion(getDb(), "shadow", "assisted", "two-week vacation backlog skews the window", e);
+    const { rows } = await getDb().query(`select value from app_config where key = 'promotion_override'`);
+    const v = typeof rows[0].value === "string" ? JSON.parse(rows[0].value) : rows[0].value;
+    expect(v.from).toBe("shadow");
+    expect(v.to).toBe("assisted");
+    expect(v.reason).toContain("vacation");
+    expect(v.evidence.met).toBe(false);
+    expect((await getConfig(getDb())).stage).toBe("shadow"); // unknown key stripped, schema still parses
   });
 });
