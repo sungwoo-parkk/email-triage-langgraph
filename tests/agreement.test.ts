@@ -9,13 +9,14 @@ import { agreementWindow, gateEvidence, renderEvidence, recordForcedPromotion, M
 import { getConfig } from "@/lib/config";
 import { parseCliArgs } from "@/cli/main";
 import { run as promoteRun } from "@/cli/commands/promote";
+import { ask } from "@/cli/confirm";
 
 // confirm()/ask() read stdin, which vitest has no TTY for; both resolve to the same
 // src/cli/confirm.ts whether imported as "../confirm" or "@/cli/confirm", so this
 // mock intercepts promote's import.
 vi.mock("@/cli/confirm", () => ({
-  confirm: async () => true,
-  ask: async () => "mocked reason",
+  confirm: vi.fn(async () => true),
+  ask: vi.fn(async () => "mocked reason"),
 }));
 
 // Same adapter as tests/observer.test.ts: PGlite's parameterized query() cannot run
@@ -255,6 +256,26 @@ describe("triage promote: evidence-gated shadow -> assisted", () => {
     // ...means promote (confirm mocked to yes) flips the stage with no override recorded.
     await promoteRun({ command: "promote", dryRun: false, config: undefined, force: false });
     expect((await getConfig(getDb())).stage).toBe("assisted");
+    expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);
+  });
+
+  it("--force on an unmet gate records the audited override and promotes", async () => {
+    // Fresh DB from beforeEach: gate is trivially unmet (no measured decisions at all).
+    await promoteRun({ command: "promote", dryRun: false, config: undefined, force: true });
+    expect((await getConfig(getDb())).stage).toBe("assisted");
+    const { rows } = await getDb().query(`select value from app_config where key = 'promotion_override'`);
+    expect(rows).toHaveLength(1);
+    const v = typeof rows[0].value === "string" ? JSON.parse(rows[0].value) : rows[0].value;
+    expect(v.from).toBe("shadow");
+    expect(v.to).toBe("assisted");
+    expect(v.reason).toBe("mocked reason");
+    expect(v.evidence.met).toBe(false);
+  });
+
+  it("--force with an empty reason cancels without writing", async () => {
+    vi.mocked(ask).mockResolvedValueOnce("");
+    await promoteRun({ command: "promote", dryRun: false, config: undefined, force: true });
+    expect((await getConfig(getDb())).stage).toBe("shadow");
     expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);
   });
 });
