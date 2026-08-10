@@ -9,6 +9,8 @@ create table if not exists observations (
 );
 create index if not exists observations_decision_idx on observations(decision_id);
 
+-- One row per decision with >=1 observation ("measured"). Decisions no human touched are
+-- deliberately absent: unmeasured, never agreement (the honest-denominator rule).
 create or replace view v_agreement as
 select d.id as decision_id,
        d.thread_id,
@@ -29,6 +31,7 @@ cross join lateral (
 ) o
 where o.observed is not null;
 
+-- Per-category breakdown over measured decisions (feeds autoActLabels with evidence).
 create or replace view v_category_stats as
 with predicted as (
   select d.id as decision_id, (t->>'categoryId') as category_id
