@@ -102,6 +102,10 @@ re-exports/consumes them rather than duplicating (it currently hardcodes `0.85`)
   evidence: per-window rate and sample size, MET/NOT MET per window, unmeasured
   volume. The assisted-stage correction-rate display is unchanged.
 - **Digest**: while in shadow, one added line with the current 14-day evidence summary.
+- **Docs**: `docs/architecture.md`'s observer description gains the observations table
+  (measurement signal vs. corrections' learning signal); `docs/operations.md`'s stage
+  section notes that shadow→assisted promotion is now evidence-gated with an audited
+  `--force` override.
 
 ### 2.6 Error handling
 
