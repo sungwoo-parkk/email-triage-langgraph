@@ -44,7 +44,7 @@ export async function authorizeGmail(mailbox: string, log: (msg: string) => void
       res.end(code ? "Authorized — you can close this tab." : `Error: ${err}`);
       server.close();
       code ? resolve(code) : reject(new Error(err ?? "no code returned"));
-    }).listen(PORT);
+    }).listen(PORT, "127.0.0.1"); // loopback only — never expose the code-catcher to the LAN
   });
 
   const { tokens } = await oauth2.getToken(code);

@@ -1,3 +1,4 @@
+import { cronAuthorized } from "@/lib/cronAuth";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { makeGmail } from "@/lib/mail/gmail";
@@ -12,7 +13,7 @@ import { loadExemplars } from "@/lib/promptgen";
 export const maxDuration = 300;
 
 export async function GET(req: Request) {
-  if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`)
+  if (!cronAuthorized(req))
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const db = getDb();

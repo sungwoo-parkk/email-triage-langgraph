@@ -1,10 +1,11 @@
+import { cronAuthorized } from "@/lib/cronAuth";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { makeGmail } from "@/lib/mail/gmail";
 import { getOfficeConfig } from "@/lib/officeConfig";
 
 export async function GET(req: Request) {
-  if (req.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`)
+  if (!cronAuthorized(req))
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const db = getDb();
   // Config is the single source of truth for who gets alerted (no more ALERT_EMAIL
