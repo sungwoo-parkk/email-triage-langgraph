@@ -1,13 +1,13 @@
 import type { CliArgs } from "../main";
 import { getDb, type Querier } from "../../lib/db";
 import { getConfig } from "../../lib/config";
+import { gateEvidence, renderEvidence } from "../../lib/agreement";
 
 const pct = (n: number) => `${Math.round(n * 100)}%`;
 
 // Promotion gates are two DIFFERENT metrics at two different stages — never conflate them with
 // each other or with mine.ts's EVAL_FLOOR (that one gates the onboarding report, not staging).
 // Spec: docs/superpowers/specs/2026-08-05-email-triage-design.md §5.
-const PROMOTION_GATE_AGREEMENT = 0.85; // shadow -> assisted: >=85% exact label-set agreement, sustained
 const ASSISTED_CORRECTION_RATE_GATE = 0.05; // assisted -> autonomous: <5% correction rate on auto-labels, over 2 weeks
 
 async function loadStatus(db: Querier) {
@@ -52,16 +52,7 @@ export async function run(_args: CliArgs): Promise<void> {
 
   console.log();
   if (cfg.stage === "shadow") {
-    // Spec defines this gate as agreement, so — and only here — it's fair to read
-    // (1 - correction rate) as an agreement proxy.
-    const agreementRate = correctionRate === null ? null : 1 - correctionRate;
-    const gateMet = agreementRate !== null && agreementRate >= PROMOTION_GATE_AGREEMENT;
-    console.log(`Promotion gate (shadow -> assisted): >= ${pct(PROMOTION_GATE_AGREEMENT)} agreement on high-confidence decisions, sustained over time.`);
-    console.log(
-      agreementRate === null
-        ? `  Not enough data yet to say whether this is met.`
-        : `  Observed over the last 7 days: ${pct(agreementRate)} agreement. ${gateMet ? "MET for this window — sustain it before promoting." : "NOT met."}`
-    );
+    console.log(renderEvidence(await gateEvidence(getDb(), Date.now())));
   } else if (cfg.stage === "assisted") {
     // The spec's gate here is a correction rate, not an agreement percentage — do not restate
     // it as one. Our window (7 days) is also shorter than the spec's (2 weeks), so this stays

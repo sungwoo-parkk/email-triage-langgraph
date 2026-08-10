@@ -9,6 +9,7 @@ import { agreementWindow, gateEvidence, renderEvidence, recordForcedPromotion, M
 import { getConfig } from "@/lib/config";
 import { parseCliArgs } from "@/cli/main";
 import { run as promoteRun } from "@/cli/commands/promote";
+import { run as statusRun } from "@/cli/commands/status";
 import { ask } from "@/cli/confirm";
 
 // confirm()/ask() read stdin, which vitest has no TTY for; both resolve to the same
@@ -277,5 +278,32 @@ describe("triage promote: evidence-gated shadow -> assisted", () => {
     await promoteRun({ command: "promote", dryRun: false, config: undefined, force: true });
     expect((await getConfig(getDb())).stage).toBe("shadow");
     expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);
+  });
+});
+
+describe("triage status: shadow stage shows measured evidence, not the proxy", () => {
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg);
+    process.env.DATABASE_URL = "postgres://unused-tests-inject-via-setDb";
+  });
+
+  it("prints window evidence and never the (1 - correction rate) proxy line", async () => {
+    const id = await seedHighConfidence(getDb(), "t-status", ["sales"], NOW - 2 * DAY);
+    await observe(getDb(), id, "t-status", "sales");
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, "log").mockImplementation((...a: unknown[]) => { logs.push(a.join(" ")); });
+    try {
+      await statusRun({ command: "status", dryRun: false, config: undefined, force: false });
+    } finally {
+      spy.mockRestore();
+    }
+    const out = logs.join("\n");
+    expect(out).toContain("measured high-confidence decision");
+    expect(out).toContain("NOT met"); // 1 measured decision can't clear n >= 25
+    expect(out).not.toContain("agreement proxy");
+    expect(out).not.toMatch(/Observed over the last 7 days: \d+% agreement/);
   });
 });
