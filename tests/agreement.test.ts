@@ -198,4 +198,13 @@ describe("agreement gate (spec 2026-08-10 §2.4)", () => {
     expect(v.evidence.met).toBe(false);
     expect((await getConfig(getDb())).stage).toBe("shadow"); // unknown key stripped, schema still parses
   });
+
+  it("unmeasured honors [since, until) on decision created_at; excludes future decisions", async () => {
+    // high-confidence decision inside the 14-day span, no observation -> unmeasured
+    await seedHighConfidence(getDb(), "inside", ["sales"], NOW - 3 * DAY);
+    // high-confidence decision AFTER evaluation instant (future/clock skew) -> NOT counted in unmeasured
+    await seedHighConfidence(getDb(), "future", ["sales"], NOW + DAY);
+    const e = await gateEvidence(getDb(), NOW);
+    expect(e.unmeasured).toBe(1); // only the "inside" decision
+  });
 });

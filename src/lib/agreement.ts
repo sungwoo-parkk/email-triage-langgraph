@@ -43,8 +43,9 @@ export async function gateEvidence(db: Querier, nowMs: number): Promise<GateEvid
     `select count(*)::int as n from decisions d
      where d.confidence = 'high'
        and d.created_at >= to_timestamp($1 / 1000.0)
+       and d.created_at <  to_timestamp($2 / 1000.0)
        and not exists (select 1 from observations o where o.decision_id = d.id)`,
-    [spans[0].sinceMs]
+    [spans[0].sinceMs, spans[1].untilMs]
   );
   return { windows, overall, unmeasured: Number(rows[0]?.n ?? 0), met: windows[0].met && windows[1].met };
 }
