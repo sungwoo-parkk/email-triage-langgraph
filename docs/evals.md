@@ -34,6 +34,20 @@ These are the last full measurements taken under the historical label-shaped har
 
 Label hallucination is not a metric because it is structurally impossible: the zod enum is built from the office config at runtime and locks output to its category vocabulary (14 categories + `junk` for this example office). Once entity extraction lands (ADR-12), extraction hallucination becomes a *programmatic* metric (extracted policy number either appears in the source or it doesn't).
 
+## Model selection (Gemini tiers)
+
+Same dataset, same judges (pinned to `GEMINI_JUDGE_MODEL`), same prompt — only the tier
+under test changes, so row differences are attributable to the model alone. The production
+choice stays evidence-based: the baseline tier must justify its cost/latency against its
+siblings on the identical golden set. Regenerate with `npm run eval-matrix` (sequential,
+fail-closed: the table is only rewritten when the baseline row succeeds).
+
+Tiers compared: `gemini-3.5-flash-lite`, `gemini-3.6-flash` (the production baseline), and `gemini-3.1-pro-preview` — the current lite/flash/pro siblings verified against the models API.
+
+<!-- eval-matrix:start -->
+_Not yet generated — run `npm run eval-matrix`._
+<!-- eval-matrix:end -->
+
 ## Running
 
 ```bash
