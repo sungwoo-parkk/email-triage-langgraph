@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { setDb, getDb, type Querier } from "@/lib/db";
 import { runMigrations } from "@/lib/migrate";
@@ -7,6 +7,16 @@ import { decide, recordDecision } from "@/lib/decide";
 import { normalize } from "@/lib/normalize";
 import { agreementWindow, gateEvidence, renderEvidence, recordForcedPromotion, MIN_WINDOW_N } from "@/lib/agreement";
 import { getConfig } from "@/lib/config";
+import { parseCliArgs } from "@/cli/main";
+import { run as promoteRun } from "@/cli/commands/promote";
+
+// confirm()/ask() read stdin, which vitest has no TTY for; both resolve to the same
+// src/cli/confirm.ts whether imported as "../confirm" or "@/cli/confirm", so this
+// mock intercepts promote's import.
+vi.mock("@/cli/confirm", () => ({
+  confirm: async () => true,
+  ask: async () => "mocked reason",
+}));
 
 // Same adapter as tests/observer.test.ts: PGlite's parameterized query() cannot run
 // multi-statement DDL, so no-param CREATE/INSERT/ALTER goes through exec().
@@ -206,5 +216,45 @@ describe("agreement gate (spec 2026-08-10 §2.4)", () => {
     await seedHighConfidence(getDb(), "future", ["sales"], NOW + DAY);
     const e = await gateEvidence(getDb(), NOW);
     expect(e.unmeasured).toBe(1); // only the "inside" decision
+  });
+});
+
+describe("triage promote: evidence-gated shadow -> assisted", () => {
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg);
+    process.env.DATABASE_URL = "postgres://unused-tests-inject-via-setDb";
+  });
+
+  it("parseCliArgs understands --force (default false)", () => {
+    expect(parseCliArgs(["promote", "--force"]).force).toBe(true);
+    expect(parseCliArgs(["promote"]).force).toBe(false);
+  });
+
+  it("refuses shadow -> assisted when the gate is not met and --force is absent", async () => {
+    await expect(
+      promoteRun({ command: "promote", dryRun: false, config: undefined, force: false })
+    ).rejects.toThrow(/gate NOT met/i);
+    // Stage unchanged: refusal happens before any confirm/write.
+    expect((await getConfig(getDb())).stage).toBe("shadow");
+  });
+
+  it("end to end: a sustained two-window shadow record promotes without --force (spec §5.1)", async () => {
+    // promoteRun evaluates the gate at Date.now(), so seed relative to the real clock
+    // here (not the fixed NOW constant the pure window tests use).
+    const now = Date.now();
+    // Two weeks of measured agreement above the bar in BOTH windows...
+    for (let i = 0; i < 25; i++) {
+      const a = await seedHighConfidence(getDb(), `e2e-w1-${i}`, ["sales"], now - 13 * DAY + i * 60_000);
+      await observe(getDb(), a, `e2e-w1-${i}`, i < 23 ? "sales" : "support"); // 92%
+      const b = await seedHighConfidence(getDb(), `e2e-w2-${i}`, ["sales"], now - 6 * DAY + i * 60_000);
+      await observe(getDb(), b, `e2e-w2-${i}`, i < 22 ? "sales" : "support"); // 88%
+    }
+    // ...means promote (confirm mocked to yes) flips the stage with no override recorded.
+    await promoteRun({ command: "promote", dryRun: false, config: undefined, force: false });
+    expect((await getConfig(getDb())).stage).toBe("assisted");
+    expect((await getDb().query(`select 1 from app_config where key='promotion_override'`)).rows).toHaveLength(0);
   });
 });

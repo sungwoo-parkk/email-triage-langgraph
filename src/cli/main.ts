@@ -1,16 +1,20 @@
 import { parseArgs } from "node:util";
 
-export interface CliArgs { command: "init" | "status" | "promote" | "pause"; dryRun: boolean; config: string | undefined }
+export interface CliArgs { command: "init" | "status" | "promote" | "pause"; dryRun: boolean; config: string | undefined; force: boolean }
 
 export function parseCliArgs(argv: string[]): CliArgs {
   const { positionals, values } = parseArgs({
     args: argv, allowPositionals: true,
-    options: { "dry-run": { type: "boolean", default: false }, config: { type: "string" } },
+    options: {
+      "dry-run": { type: "boolean", default: false },
+      config: { type: "string" },
+      force: { type: "boolean", default: false },
+    },
   });
   const command = positionals[0];
   if (!["init", "status", "promote", "pause"].includes(command ?? ""))
     throw new Error(`unknown command: ${command ?? "(none)"} — expected init | status | promote | pause`);
-  return { command: command as CliArgs["command"], dryRun: values["dry-run"]!, config: values.config };
+  return { command: command as CliArgs["command"], dryRun: values["dry-run"]!, config: values.config, force: values.force! };
 }
 
 async function main() {
