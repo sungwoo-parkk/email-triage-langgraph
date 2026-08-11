@@ -34,6 +34,13 @@ export async function observeSentMail(db: Querier, mail: MailClient, cfg: Office
     const dec = await db.query(
       `select id, final_tasks, status from decisions where thread_id = $1 order by id desc limit 1`, [g.threadId]);
     if (!dec.rows.length) continue;
+    // Measurement signal (spec 2026-08-10): every matched human forward is recorded,
+    // agreement or not — v_agreement's denominator is decisions with >=1 observation.
+    // Corrections below stay the learning signal, untouched.
+    await db.query(
+      `insert into observations (thread_id, decision_id, category_id) values ($1,$2,$3)
+       on conflict (decision_id, category_id) do nothing`,
+      [g.threadId, dec.rows[0].id, g.categoryId]);
     const tasks = typeof dec.rows[0].final_tasks === "string" ? JSON.parse(dec.rows[0].final_tasks) : dec.rows[0].final_tasks;
     const already = (tasks as any[]).some((t) => t.categoryId === g.categoryId);
     if (dec.rows[0].status !== "needs_review" && already) continue; // agreement, not a correction

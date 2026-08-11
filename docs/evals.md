@@ -30,9 +30,31 @@ Runs execute as **LangSmith experiments** (`npm run eval`), so every model/promp
 | `faithfulness` | LLM judge | Rationale grounded in the email — no fabricated details | **97.0%** |
 | `instruction_following` | LLM judge | 4-point rubric: task splitting, companion labels, forward conventions, confidence honesty | **97.4%** |
 
-These are the last full measurements taken under the historical label-shaped harness (2026-08-07, pre-translation); a `--sync` run re-uploads the translated dataset and re-measures on the identical model/prompt, so the numbers are expected to hold — the translation changes only how both sides are compared, not what the classifier predicts. Re-verified narrowly (3-example smoke run, `--no-judges`) as part of this translation: `exact_set_match`/`forward_match`/`task_count_match` all 100% on that subset.
+These are the last full measurements taken under the historical label-shaped harness (2026-08-07, pre-translation); the 2026-08-10 post-translation matrix re-measured the same model at 82.1% exact-set (reproduced 82–84% on a judgeless re-run), so the 2026-08-07 figures above are historical, pre-translation numbers — the Model selection table below is the current measurement. Re-verified narrowly (3-example smoke run, `--no-judges`) as part of this translation: `exact_set_match`/`forward_match`/`task_count_match` all 100% on that subset.
 
 Label hallucination is not a metric because it is structurally impossible: the zod enum is built from the office config at runtime and locks output to its category vocabulary (14 categories + `junk` for this example office). Once entity extraction lands (ADR-12), extraction hallucination becomes a *programmatic* metric (extracted policy number either appears in the source or it doesn't).
+
+## Model selection (Gemini tiers)
+
+Same dataset, same judges (pinned to `GEMINI_JUDGE_MODEL`), same prompt — only the tier
+under test changes, so row differences are attributable to the model alone. The production
+choice stays evidence-based: the baseline tier must justify its cost/latency against its
+siblings on the identical golden set. Regenerate with `npm run eval-matrix` (sequential,
+fail-closed: the table is only rewritten when the baseline row succeeds).
+
+Tiers compared: `gemini-3.5-flash-lite`, `gemini-3.6-flash` (the production baseline), and `gemini-3.1-pro-preview` — the current lite/flash/pro siblings verified against the models API.
+
+<!-- eval-matrix:start -->
+| Model | Exact-set | Task-split | Forward | Faithfulness | Instr.-following | Latency (mean) | Cost / 1K emails |
+|---|---|---|---|---|---|---|---|
+| gemini-3.5-flash-lite | 91.0% | 100.0% | 100.0% | 98.5% | 76.9% | 0.62s | $0.33 |
+| gemini-3.6-flash | 82.1% | 100.0% | 98.5% | 100.0% | 76.1% | 2.31s | $1.20 |
+| gemini-3.1-pro-preview | 86.6% | 100.0% | 98.5% | 100.0% | 77.6% | 3.36s | $1.88 |
+
+_Cost = measured mean tokens/email × published prices as of 2026-08; judges pinned to `GEMINI_JUDGE_MODEL` for every row; "—" = usage or price unavailable (never estimated)._
+<!-- eval-matrix:end -->
+
+_The Instr.-following column is under investigation: the judge's conventions rubric still speaks the retired 42-label Gmail vocabulary while the classifier now emits category ids, so its uniform ~20-point depression across every tier is suspected judge-vocabulary mismatch, not model regression — recalibrate the judge before quoting this metric._
 
 ## Running
 

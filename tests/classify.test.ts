@@ -37,3 +37,27 @@ describe("makeClassifier", () => {
     expect(seen).toContain("rules already suggest");
   });
 });
+
+describe("classifier usage_metadata passthrough (spec 2026-08-10 §3.2)", () => {
+  const ucfg = loadOfficeConfig("examples/hartley/triage.config.json");
+  const email = normalize({
+    threadId: "t-usage", from: "a@vendor.example", to: [], subject: "s", listId: null,
+    attachments: [], bodyText: "b", internalDateMs: 0, references: [],
+  });
+  const noRules = { hits: [], labels: [], forwards: [], complete: false };
+  const parsed = { tasks: [{ category: "sales" }], confidence: "high", rationale: "r" };
+
+  it("surfaces usage_metadata when the model returns includeRaw shape", async () => {
+    const model = { invoke: async () => ({ parsed, raw: { usage_metadata: { input_tokens: 1200, output_tokens: 40, total_tokens: 1240 } } }) };
+    const c = await makeClassifier(ucfg, [], model)(email, noRules);
+    expect(c.tasks[0].category).toBe("sales");
+    expect(c.usage_metadata).toEqual({ input_tokens: 1200, output_tokens: 40 });
+  });
+
+  it("a plain parsed object (fakes, older providers) still works, without usage", async () => {
+    const model = { invoke: async () => parsed };
+    const c = await makeClassifier(ucfg, [], model)(email, noRules);
+    expect(c.tasks[0].category).toBe("sales");
+    expect(c.usage_metadata).toBeUndefined();
+  });
+});

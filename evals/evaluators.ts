@@ -112,3 +112,16 @@ export async function instructionFollowing(run: any, example: any) {
   const score = checks.filter(Boolean).length / checks.length;
   return { key: "instruction_following", score, comment: grade.reasoning };
 }
+
+// Free programmatic passthroughs: the target attaches usage_metadata (src/lib/classify.ts,
+// includeRaw). score is the raw token count (null when the provider sent no usage), so the
+// experiment mean IS mean tokens/email — the matrix's cost input. Never estimated.
+export function inputTokens(run: any, _example: any) {
+  const t = run.outputs?.usage_metadata?.input_tokens;
+  return { key: "input_tokens", score: typeof t === "number" ? t : null, comment: typeof t === "number" ? `${t} input tokens` : "no usage_metadata" };
+}
+
+export function outputTokens(run: any, _example: any) {
+  const t = run.outputs?.usage_metadata?.output_tokens;
+  return { key: "output_tokens", score: typeof t === "number" ? t : null, comment: typeof t === "number" ? `${t} output tokens` : "no usage_metadata" };
+}

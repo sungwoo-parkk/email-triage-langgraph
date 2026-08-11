@@ -15,6 +15,10 @@ export function makeClassificationSchema(cfg: OfficeConfig) {
 }
 export type Classification = z.infer<ReturnType<typeof makeClassificationSchema>>;
 
+export type ClassificationWithUsage = Classification & {
+  usage_metadata?: { input_tokens: number; output_tokens: number };
+};
+
 export interface ClassifierModel { invoke(messages: [string, string][]): Promise<unknown> }
 
 // LangChain's own initChatModel provider registry spells Google's Gemini API
@@ -35,17 +39,28 @@ async function defaultModel(cfg: OfficeConfig, schema: ReturnType<typeof makeCla
   const modelId = rest.join(":");
   const modelProvider = LANGCHAIN_PROVIDER_ALIASES[providerId] ?? providerId;
   const llm = await initChatModel(modelId, { modelProvider, temperature: 0, apiKey });
-  return llm.withStructuredOutput(schema) as unknown as ClassifierModel;
+  return llm.withStructuredOutput(schema, { includeRaw: true }) as unknown as ClassifierModel;
 }
 
 export function makeClassifier(cfg: OfficeConfig, exemplars: Exemplar[], model?: ClassifierModel) {
   const schema = makeClassificationSchema(cfg);
   const system = buildSystemPrompt(cfg, exemplars);
   let m: ClassifierModel | undefined = model;
-  return async (email: NormalizedEmail, ruleEvidence: RuleOutcome): Promise<Classification> => {
+  // includeRaw providers resolve { parsed, raw }; injected fakes and older providers resolve
+  // the parsed object directly. Unwrap either, validate the parsed half, re-attach usage.
+  const unwrap = (res: unknown): ClassificationWithUsage => {
+    const r = res as any;
+    const isWrapped = r && typeof r === "object" && "parsed" in r && "raw" in r;
+    const parsed = schema.parse(isWrapped ? r.parsed : r);
+    const u = isWrapped ? r.raw?.usage_metadata : undefined;
+    return typeof u?.input_tokens === "number" && typeof u?.output_tokens === "number"
+      ? { ...parsed, usage_metadata: { input_tokens: u.input_tokens, output_tokens: u.output_tokens } }
+      : parsed;
+  };
+  return async (email: NormalizedEmail, ruleEvidence: RuleOutcome): Promise<ClassificationWithUsage> => {
     m ??= await defaultModel(cfg, schema);
     const messages: [string, string][] = [["system", system], ["human", emailPrompt(email, ruleEvidence)]];
-    try { return schema.parse(await m.invoke(messages)); }
-    catch { return schema.parse(await m.invoke(messages)); } // one retry, then throw
+    try { return unwrap(await m.invoke(messages)); }
+    catch { return unwrap(await m.invoke(messages)); } // one retry, then throw
   };
 }

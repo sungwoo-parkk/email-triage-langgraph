@@ -77,6 +77,8 @@ Postgres is the system of record; migrations in `migrations/`.
 | `ingest_state` | Checkpoint (ms) + last-success timestamp (watchdog reads this). |
 | `ingest_failures` | Per-thread strike counter with last error. |
 
+Alongside `corrections` (the learning signal), every matched human forward is also recorded in `observations` (the measurement signal). `v_agreement` compares each decision's predicted category set against the humanly-observed set at read time — so a late second forward on a multi-request thread reconciles automatically — and `v_category_stats` breaks the same comparison down per category. Decisions no human ever touched are unmeasured, never counted as agreement; the shadow→assisted promotion gate reads only this measured population (see `src/lib/agreement.ts`).
+
 ## Gmail authorization
 
 Per-mailbox OAuth (decided 2026-08-06; DWD declined — see [decisions.md](decisions.md#adr-9)):

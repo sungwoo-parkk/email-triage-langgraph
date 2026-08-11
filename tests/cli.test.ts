@@ -8,8 +8,8 @@ import path from "node:path";
 
 describe("parseCliArgs", () => {
   it("routes commands and flags", () => {
-    expect(parseCliArgs(["init", "--dry-run"])).toEqual({ command: "init", dryRun: true, config: undefined });
-    expect(parseCliArgs(["promote"])).toEqual({ command: "promote", dryRun: false, config: undefined });
+    expect(parseCliArgs(["init", "--dry-run"])).toEqual({ command: "init", dryRun: true, config: undefined, force: false });
+    expect(parseCliArgs(["promote"])).toEqual({ command: "promote", dryRun: false, config: undefined, force: false });
     expect(() => parseCliArgs(["dance"])).toThrow(/unknown command/i);
   });
 });

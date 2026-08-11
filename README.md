@@ -68,6 +68,7 @@ This system was built once, for real, against a single real mailbox — `pro@age
 | 67-example synthetic golden set (ongoing CI regression, LangSmith) | 91.0% exact-set match, 100% task-split accuracy, 100% forward-convention accuracy |
 | LLM-judge quality checks | 97.0% faithfulness (no fabricated rationale), 97.4% instruction-following |
 | One-time live shadow-mode run | 7/7 threads triaged, 0 failures, 0 mailbox writes |
+| Gemini tier comparison (3.5-flash-lite / 3.6-flash / 3.1-pro-preview, identical golden set + pinned judges) | see [docs/evals.md → Model selection](docs/evals.md#model-selection-gemini-tiers) |
 
 Full numbers and method: [docs/case-study/README.md](docs/case-study/README.md), [docs/evals.md](docs/evals.md), and the original [design spec](docs/case-study/design-spec.md) §7.
 

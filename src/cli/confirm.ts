@@ -10,3 +10,13 @@ export async function confirm(message: string): Promise<boolean> {
     rl.close();
   }
 }
+
+/** Prompts for a free-text answer on the terminal. Returns the trimmed reply ("" if empty). */
+export async function ask(message: string): Promise<string> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    return (await rl.question(`${message} `)).trim();
+  } finally {
+    rl.close();
+  }
+}

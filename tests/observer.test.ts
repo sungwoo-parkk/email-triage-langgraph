@@ -192,3 +192,57 @@ describe("observeSentMail: system review-forwards are not human corrections (fin
     expect(rows[0].category_id).toBe("jo");
   });
 });
+
+describe("observeSentMail: observations (measurement signal, spec 2026-08-10)", () => {
+  beforeEach(async () => {
+    const p = new PGlite();
+    setDb(pgliteAdapter(p));
+    await runMigrations(getDb());
+    await setOfficeConfig(getDb(), cfg);
+  });
+
+  it("an agreeing forward records an observation and still no correction", async () => {
+    const decisionId = await seedDecided(getDb(), "t-agree", "sales");
+    const mail = makeFakeMail({ sent: [snap("t-agree", { to: ["sales@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    const obs = await getDb().query(`select decision_id, category_id from observations where thread_id='t-agree'`);
+    expect(obs.rows).toEqual([{ decision_id: decisionId, category_id: "sales" }]);
+    expect((await getDb().query(`select 1 from corrections where thread_id='t-agree'`)).rows).toHaveLength(0);
+    // Stitch: the observer-written row is what v_agreement measures (observer -> view chain).
+    const va = await getDb().query(`select agreed from v_agreement where thread_id='t-agree'`);
+    expect(va.rows).toHaveLength(1);
+    expect(va.rows[0].agreed).toBe(true);
+  });
+
+  it("a contradicting forward records BOTH an observation and a correction", async () => {
+    await seedDecided(getDb(), "t-contra", "sales");
+    const mail = makeFakeMail({ sent: [snap("t-contra", { to: ["support@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    expect((await getDb().query(`select category_id from observations where thread_id='t-contra'`)).rows[0].category_id).toBe("support");
+    expect((await getDb().query(`select category_id from corrections where thread_id='t-contra'`)).rows[0].category_id).toBe("support");
+  });
+
+  it("re-observing the same forward does not duplicate the observation", async () => {
+    await seedDecided(getDb(), "t-dupe", "sales");
+    const mail = makeFakeMail({ sent: [snap("t-dupe", { to: ["sales@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    mail.pushSent(snap("t-dupe", { to: ["sales@hartleysons.example"], internalDateMs: NOW - 500 }));
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    expect((await getDb().query(`select count(*)::int as n from observations where thread_id='t-dupe'`)).rows[0].n).toBe(1);
+  });
+
+  it("a TRIAGE_MARKER (system-sent) forward records no observation", async () => {
+    await seedDecided(getDb(), "t-sys", "sales");
+    const mail = makeFakeMail({
+      sent: [snap("t-sys", { to: ["sales@hartleysons.example"], bodyText: `${TRIAGE_MARKER} context`, internalDateMs: NOW - 1000 })],
+    });
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    expect((await getDb().query(`select 1 from observations where thread_id='t-sys'`)).rows).toHaveLength(0);
+  });
+
+  it("a forward of an unknown thread records no observation", async () => {
+    const mail = makeFakeMail({ sent: [snap("t-unknown", { to: ["sales@hartleysons.example"], internalDateMs: NOW - 1000 })] });
+    await observeSentMail(getDb(), mail, cfg, NOW);
+    expect((await getDb().query(`select count(*)::int as n from observations`)).rows[0].n).toBe(0);
+  });
+});
